@@ -1,0 +1,4 @@
+Sitemap: https://blog.comind.me/sitemap.xml
+
+User-agent: *
+Disallow:
