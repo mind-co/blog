@@ -56,7 +56,7 @@ header {
 
 @font-face {
   font-family: "Bungee"; /* Define a name for your font */
-  src: url("/assets/Bungee-Regular.woff") format("truetype");
+  src: url("/assets/Bungee-Regular.ttf") format("truetype");
 }
 
 header .blog-name {
