@@ -64,9 +64,9 @@ html {
   font-size: 80%;
   font-family: Arial, serif;
   color: #a6a2a0;
+  opacity: 0.5;
   text-align: center;
   margin-top: 6em;
-  border-top: 1px solid lightgrey;
   padding-top: 2em;
   margin-bottom: 4em;
 }
@@ -108,9 +108,17 @@ html {
     TITLES
 ================================================================== */
 
-.franklin-content h1 { font-size: 24px; }
-.franklin-content h2 { font-size: 22px; }
-.franklin-content h3 { font-size: 20px; }
+.franklin-content h1 {
+  font-size: 24px;
+  font-family: "Bungee", "Lucida Console", Monaco, monospace;
+}
+.franklin-content h2 {
+  font-size: 22px;
+  font-family: "Bungee", "Lucida Console", Monaco, monospace;
+}
+.franklin-content h3 {
+  font-size: 20px;
+}
 
 .franklin-content h1,
 h2,
@@ -123,30 +131,54 @@ h6 {
 
 .franklin-content h1 {
   padding-bottom: 0.5em;
-  border-bottom: 3px double lightgrey;
+  /* border-bottom: 3px double lightgrey; */
   margin-top: 1.5em;
   margin-bottom: 1em;
 }
 
 .franklin-content h2 {
   padding-bottom: 0.3em;
-  border-bottom: 1px solid lightgrey;
+  /* border-bottom: 1px solid lightgrey; */
   margin-top: 2em;
   margin-bottom: 1em;
 }
 
-.franklin-content h1 a { color: inherit; }
-.franklin-content h1 a:hover { text-decoration: none; }
-.franklin-content h2 a { color: inherit; }
-.franklin-content h2 a:hover { text-decoration: none; }
-.franklin-content h3 a { color: inherit; }
-.franklin-content h3 a:hover { text-decoration: none; }
-.franklin-content h4 a { color: inherit; }
-.franklin-content h4 a:hover { text-decoration: none; }
-.franklin-content h5 a { color: inherit; }
-.franklin-content h5 a:hover { text-decoration: none; }
-.franklin-content h6 a { color: inherit; }
-.franklin-content h6 a:hover { text-decoration: none; }
+.franklin-content h1 a {
+  color: inherit;
+}
+.franklin-content h1 a:hover {
+  text-decoration: none;
+}
+.franklin-content h2 a {
+  color: inherit;
+}
+.franklin-content h2 a:hover {
+  text-decoration: none;
+}
+.franklin-content h3 a {
+  color: inherit;
+}
+.franklin-content h3 a:hover {
+  text-decoration: none;
+}
+.franklin-content h4 a {
+  color: inherit;
+}
+.franklin-content h4 a:hover {
+  text-decoration: none;
+}
+.franklin-content h5 a {
+  color: inherit;
+}
+.franklin-content h5 a:hover {
+  text-decoration: none;
+}
+.franklin-content h6 a {
+  color: inherit;
+}
+.franklin-content h6 a:hover {
+  text-decoration: none;
+}
 
 .franklin-content table {
   margin-left: auto;
@@ -188,7 +220,7 @@ td {
 }
 
 .franklin-content a {
-  color: #004de6;
+  color: var(--primary-color);
   text-decoration: none;
 }
 
@@ -200,8 +232,12 @@ td {
     HYPERREFS AND FOOTNOTES
 ================================================================== */
 
-.franklin-content .eqref a { color: green; }
-.franklin-content .bibref a { color: green; }
+.franklin-content .eqref a {
+  color: green;
+}
+.franklin-content .bibref a {
+  color: green;
+}
 
 .franklin-content sup {
   font-size: 70%;
@@ -257,9 +293,13 @@ td {
     KATEX
 ================================================================== */
 
-body { counter-reset: eqnum; }
+body {
+  counter-reset: eqnum;
+}
 
-.katex { font-size: 1em !important; }
+.katex {
+  font-size: 1em !important;
+}
 
 .katex-display .katex {
   /* Overwrite KaTeX settings. */
@@ -309,10 +349,16 @@ code {
   border-radius: 10px;
 }
 
-.hljs-meta { font-weight: bold;}
+.hljs-meta {
+  font-weight: bold;
+}
 
-.hljs-meta.shell_ {color: crimson;}
-.hljs-meta.prompt_ {color: rgb(25, 179, 51);}
+.hljs-meta.shell_ {
+  color: crimson;
+}
+.hljs-meta.prompt_ {
+  color: rgb(25, 179, 51);
+}
 
 .code-output {
   background: var(--output-background);

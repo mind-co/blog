@@ -4,7 +4,7 @@
 
 /* Add primary, secondary, and tertiary colors */
 :root {
-  --primary-color: rgba(0, 137, 200, 1.0);
+  --primary-color: rgba(0, 137, 200, 1);
   --secondary-color: rgba(207, 94, 74, 1);
   --tertiary-color: rgba(0, 152, 119, 1);
 }
@@ -50,8 +50,13 @@ header {
 }
 
 @font-face {
-  font-family: 'Bungee Pop'; /* Define a name for your font */
-  src: url('_assets/bunpop.ttf') format('truetype'); /* Path to your font file */
+  font-family: "Bungee Pop"; /* Define a name for your font */
+  src: url("_assets/bunpop.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Bungee"; /* Define a name for your font */
+  src: url("_assets/Bungee-Regular.woff") format("truetype");
 }
 
 header .blog-name {
@@ -106,7 +111,9 @@ header li a:hover {
 medium display: nav goes under name
 */
 @media (max-width: 760px) {
-  header { display: block; }
+  header {
+    display: block;
+  }
 
   header .blog-name {
     display: block;
@@ -161,8 +168,12 @@ instead, display a burger menu.
     padding: 0;
     margin: 0;
   }
-  header li a { border-bottom: none; }
-  header li a:hover { border-bottom: none; }
+  header li a {
+    border-bottom: none;
+  }
+  header li a:hover {
+    border-bottom: none;
+  }
 
   nav:hover ul {
     display: block;
