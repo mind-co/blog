@@ -2,32 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
-    <loc>https://blog.comind.me/menu1/index.html</loc>
-    <lastmod>2024-02-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://blog.comind.me/menu3/index.html</loc>
-    <lastmod>2024-02-22</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
     <loc>https://blog.comind.me/index.html</loc>
-    <lastmod>2024-02-22</lastmod>
+    <lastmod>2024-03-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://blog.comind.me/menu2/index.html</loc>
-    <lastmod>2024-02-22</lastmod>
+    <loc>https://blog.comind.me/posts/hello-blog/index.html</loc>
+    <lastmod>2024-03-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://blog.comind.me/posts/intro/index.html</loc>
-    <lastmod>2024-02-22</lastmod>
+    <lastmod>2024-03-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://blog.comind.me/posts/brainstacks/index.html</loc>
+    <lastmod>2024-03-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
