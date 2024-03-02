@@ -27,4 +27,5 @@ to a fundraiser for my the [South End Rowing Club](https://serc.com) in the even
 I'm also going to work on the blog a bit more, especially after each night when I have a session like this!
 
 Thanks for reading!
+
 Cameron
