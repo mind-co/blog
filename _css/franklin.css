@@ -104,6 +104,22 @@ html {
   }
 }
 
+#span2 {
+  color: var(--secondary-color);
+}
+
+/* For collapsing "comind" into "co" */
+@media (max-width: 480px) {
+  #span3 {
+    display: none;
+  }
+
+  /* span3 becomes tertiary  */
+  #span2 {
+    color: var(--tertiary-color);
+  }
+}
+
 /* ==================================================================
     TITLES
 ================================================================== */

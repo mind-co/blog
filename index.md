@@ -78,6 +78,10 @@ blogposts = hfun_blogposts()
 
 this is the blog for Comind, a communal thinking tool. Contact us at [inquiries@mindco.link](mailto:inquiries@mindco.link) or send good vibes to [vibes@comind.me]. we might have a discord server soon. this place is a mess.
 
+we've got a list of things that comind is intended to address on our [inspirations](/inspirations) page.
+
+there's also some blog posts.
+
 ## Posts
 
 {{blogposts}}

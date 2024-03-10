@@ -93,8 +93,8 @@ header li a:hover {
 
 @media (min-width: 481px) {
   header {
-    padding-left: 12.5%;
-    padding-right: 12.5%;
+    padding-left: 6%;
+    padding-right: 6%;
   }
 }
 
@@ -139,7 +139,8 @@ instead, display a burger menu.
 
   header .blog-name {
     display: inline-block;
-    width: 70%;
+    width: 100%;
+    text-align: center;
   }
 
   nav {
