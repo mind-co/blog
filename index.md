@@ -8,20 +8,32 @@ function hfun_blogposts()
     curyear = year(Dates.today())
     io = IOBuffer()
 
+    # The directory where the posts are located.
+    # By default this is "posts".
     base = "posts"
 
     # List all files in the posts directory
-    posts = filter!(p -> endswith(p, ".md"), readdir(base))
+    posts = filter!(
+        p -> endswith(p, ".md"), 
+        readdir(base, join=true)
+    )
+
+    # Sort the posts by modified date
+    posts = sort(
+        posts,
+        by=mtime,
+        rev=true
+    )
     
     # Get the first line in each file that begin with `# `
     for post in posts
-        open(joinpath(base, post)) do f
+        open(post) do f
             for line in eachline(f)
                 if startswith(line, "# ")
                     # Remove the `# ` and write the line to the buffer
                     let 
                         line = replace(line, r"# " => "")
-                        linkloc = joinpath("posts", replace(post, ".md" => ""))
+                        linkloc = joinpath("posts", replace(basename(post), ".md" => ""))
                         write(io, "- [$line]($linkloc)\n")
                     end
                     break
@@ -76,7 +88,7 @@ blogposts = hfun_blogposts()
 
 # The Comind Blog
 
-this is the blog for Comind, a communal thinking tool. Contact us at [inquiries@mindco.link](mailto:inquiries@mindco.link) or send good vibes to [vibes@comind.me]. we might have a discord server soon. this place is a mess.
+this is the blog for Comind, a communal thinking tool. Contact us at [inquiries@mindco.link](mailto:inquiries@mindco.link) or send good vibes to [vibes@comind.me](mailto:vibes@comind.me). we might have a discord server soon. this place is a mess.
 
 we've got a list of things that comind is intended to address on our [inspirations](/inspirations) page.
 
