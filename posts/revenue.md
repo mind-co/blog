@@ -52,8 +52,7 @@ For higher tiers, I can provide a substantially higher level of interaction:
 - Custom cominds and more complicated chains of thought, such as 
   - generating entire wiki-style articles
   - engaging is large-scale organizational overhauls of your data
-  - ingesting massive amounts of external data (think "hey go tell me everything there 
-  is to know about neurons")
+  - ingesting massive amounts of external data (think "hey go tell me everything there is to know about neurons")
 - Access to a personal comind with memory that knows everything you think about
 and is completely firewalled and private.
 
