@@ -208,11 +208,12 @@ tr,
 th,
 td {
   padding: 10px;
-  border: 1px solid lightgray;
+  border: 1px solid darkgray;
 }
 
 table tbody tr td {
-  border: 1px solid lightgray;
+  color: #000000;
+  border: 1px solid darkgray;
 }
 
 body {
