@@ -3,43 +3,49 @@
 
 <url>
     <loc>https://blog.comind.me/inspirations/index.html</loc>
-    <lastmod>2024-03-12</lastmod>
+    <lastmod>2024-03-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://blog.comind.me/posts/tech-stack/index.html</loc>
-    <lastmod>2024-03-12</lastmod>
+    <lastmod>2024-03-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://blog.comind.me/index.html</loc>
-    <lastmod>2024-03-12</lastmod>
+    <lastmod>2024-03-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://blog.comind.me/posts/hello-blog/index.html</loc>
-    <lastmod>2024-03-12</lastmod>
+    <lastmod>2024-03-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://blog.comind.me/posts/revenue/index.html</loc>
-    <lastmod>2024-03-12</lastmod>
+    <lastmod>2024-03-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://blog.comind.me/posts/media/index.html</loc>
+    <lastmod>2024-03-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://blog.comind.me/posts/intro/index.html</loc>
-    <lastmod>2024-03-12</lastmod>
+    <lastmod>2024-03-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
 <url>
     <loc>https://blog.comind.me/posts/brainstacks/index.html</loc>
-    <lastmod>2024-03-12</lastmod>
+    <lastmod>2024-03-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
 </url>
