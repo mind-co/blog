@@ -1,3 +1,5 @@
+@def hasdisqus = true
+
 # sup
 
 this is the comind blog

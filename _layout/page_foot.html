@@ -1,8 +1,10 @@
 
+    {{ isdef hasdisqus}}
+        {{ insert disqus.html}}
+    {{ end }}
 
 <div class="page-foot">
-    
-    © → {{ fill author }} ← © <br/>
+    {{ fill author }}© <br/>
     we made this blog with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
 <br/>
     {{isnotpage /tag}} we last changed this on {{ fill fd_mtime }}{{end}}
