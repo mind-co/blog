@@ -22,7 +22,7 @@ It may end up biting me in the ass later, but I am paying attention to scale ear
     this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
     };
     */
-    (function() { // DON'T EDIT BELOW THIS LINE
+    (function() {
     var d = document, s = d.createElement('script');
     s.src = 'https://blog-comind-me.disqus.com/embed.js';
     s.setAttribute('data-timestamp', +new Date());
