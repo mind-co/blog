@@ -2,25 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
-    <loc>https://blog.comind.me/inspirations/index.html</loc>
-    <lastmod>2024-04-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
     <loc>https://blog.comind.me/posts/tech-stack/index.html</loc>
-    <lastmod>2024-04-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://blog.comind.me/index.html</loc>
-    <lastmod>2024-04-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-</url>
-<url>
-    <loc>https://blog.comind.me/posts/hello-blog/index.html</loc>
     <lastmod>2024-04-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -32,7 +14,13 @@
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://blog.comind.me/posts/media/index.html</loc>
+    <loc>https://blog.comind.me/literate/tensors/index.html</loc>
+    <lastmod>2024-04-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://blog.comind.me/index.html</loc>
     <lastmod>2024-04-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -44,7 +32,25 @@
     <priority>0.5</priority>
 </url>
 <url>
-    <loc>https://blog.comind.me/literate/tensors/index.html</loc>
+    <loc>https://blog.comind.me/posts/fun-ideas/index.html</loc>
+    <lastmod>2024-04-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://blog.comind.me/inspirations/index.html</loc>
+    <lastmod>2024-04-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://blog.comind.me/posts/hello-blog/index.html</loc>
+    <lastmod>2024-04-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
+    <loc>https://blog.comind.me/posts/media/index.html</loc>
     <lastmod>2024-04-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
