@@ -25,7 +25,6 @@ nav li {
 }
 
 nav li a {
-  color: #004de6;
   text-decoration: none;
   font-size: 18px;
   font-weight: bold;
@@ -50,6 +49,11 @@ header {
 }
 
 @font-face {
+  font-family: "lexend";
+  src: url("/assets/font.ttf") format("truetype");
+}
+
+@font-face {
   font-family: "bunpop"; /* Define a name for your font */
   src: url("/assets/bunpop.ttf") format("truetype");
 }
@@ -62,9 +66,9 @@ header {
 header .blog-name {
   width: 100%;
   /* display: inline-block; */
-  text-align: center;
+  text-align: start;
   font-size: 64px;
-  font-family: "bunpop", "Lucida Console", Monaco, monospace;
+  font-family: "lexend", "Lucida Console", Monaco, monospace;
   padding-top: 0px;
 }
 

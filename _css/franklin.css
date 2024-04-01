@@ -16,7 +16,7 @@
 ================================================================== */
 
 html {
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: "lexend", monospace;
   font-size: var(--normal);
   color: var(--text-color);
 }
@@ -62,7 +62,7 @@ html {
 
 .page-foot {
   font-size: 80%;
-  font-family: Arial, serif;
+  font-family: Arial, sans-serif;
   color: #a6a2a0;
   opacity: 0.5;
   text-align: center;
@@ -126,11 +126,9 @@ html {
 
 .franklin-content h1 {
   font-size: 24px;
-  font-family: "Bungee", "Lucida Console", Monaco, monospace;
 }
 .franklin-content h2 {
   font-size: 22px;
-  font-family: "Bungee", "Lucida Console", Monaco, monospace;
 }
 .franklin-content h3 {
   font-size: 20px;
@@ -161,17 +159,23 @@ h6 {
 
 .franklin-content h1 a {
   color: inherit;
+  text-decoration: none !important;
 }
 .franklin-content h1 a:hover {
   text-decoration: none;
+  color: var(--secondary-color);
 }
 .franklin-content h2 a {
+  text-decoration: none !important;
   color: inherit;
 }
 .franklin-content h2 a:hover {
   text-decoration: none;
+  color: var(--secondary-color);
 }
 .franklin-content h3 a {
+  text-decoration: none !important;
+
   color: inherit;
 }
 .franklin-content h3 a:hover {
@@ -236,12 +240,13 @@ td {
 }
 
 .franklin-content a {
-  color: var(--primary-color);
-  text-decoration: none;
+  color: var(--text-color);
+  text-decoration: underline;
 }
 
 .franklin-content a:hover {
   text-decoration: underline;
+  text-decoration-color: var(--secondary-color);
 }
 
 /* ==================================================================

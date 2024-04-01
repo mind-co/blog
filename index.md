@@ -83,17 +83,18 @@ end
 blogposts = hfun_blogposts()
 +++
 
-@def title = "Comind Blog"
+@def title = "comind"
 @def tags = ["syntax", "code"]
 
-# The Comind Blog
 
-this is the blog for Comind, a communal thinking tool. Contact us at [inquiries@mindco.link](mailto:inquiries@mindco.link) or send good vibes to [vibes@comind.me](mailto:vibes@comind.me). we might have a discord server soon. this place is a mess.
+this is the main explainy-site for comind, a new way to think. sounds weird to me but hey, it's what we're doing.
+
+contact us at [inquiries@mindco.link](mailto:inquiries@mindco.link) or send good vibes to [vibes@comind.me](mailto:vibes@comind.me).
 
 we've got a list of things that comind is intended to address on our [inspirations](/inspirations) page.
 
 there's also some blog posts.
 
-## Posts
+## posts
 
 {{blogposts}}
