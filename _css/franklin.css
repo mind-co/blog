@@ -19,6 +19,7 @@ html {
   font-family: "lexend", monospace;
   font-size: var(--normal);
   color: var(--text-color);
+  font-weight: 300;
 }
 
 /* ==================================================================
@@ -351,7 +352,7 @@ code {
   background-color: var(--block-background);
   padding: 0.1em 0.2em;
   border-radius: 2px;
-  font-size: var(--small);
+  font-size: var(--normal);
 }
 
 /* .franklin-content code { */
