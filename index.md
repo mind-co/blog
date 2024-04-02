@@ -87,7 +87,7 @@ blogposts = hfun_blogposts()
 @def tags = ["syntax", "code"]
 
 
-this is the main explainy-site for comind, a new way to think. sounds weird to me but hey, it's what we're doing.
+comind is a new way to think.
 
 contact us at [inquiries@mindco.link](mailto:inquiries@mindco.link) or send good vibes to [vibes@comind.me](mailto:vibes@comind.me).
 
