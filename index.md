@@ -87,16 +87,20 @@ blogposts = hfun_blogposts()
 @def tags = ["syntax", "code"]
 
 
-comind is a new way to think.
+# think good thoughts
 
-if you go to the main site ([comind.me](https://comind.me)) you will be disappointed. comind doesn't work yet, sorry 🤙. we'll keep you updated.
+if you go to the main site ([comind.me](https://comind.me)) you will be disappointed. comind doesn't work yet, sorry 🤙. we'll keep you updated. i guess that means you can't think good thoughts. well, you can think them somewhere else. i hear the outdoors are nice.
+
+oh well, life presses on.
 
 contact us at [inquiries@mindco.link](mailto:inquiries@mindco.link) or send good vibes to [vibes@comind.me](mailto:vibes@comind.me).
 
-we've got a list of things that comind is intended to address on our [inspirations](/inspirations) page.
+## writing
 
-there's also some blog posts.
+- we try to keep [devlogs](/devlogs/)
+- we've got a list of things that comind is intended to address on our [inspirations](/inspirations) page.
 
-## posts
+
+also some blog posts
 
 {{blogposts}}

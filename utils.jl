@@ -14,3 +14,29 @@ function lx_baz(com, _)
   # do whatever you want here
   return uppercase(brace_content)
 end
+
+function hfun_list_folder(folders)
+  @info folders
+  folder = folders[1] # because the shortcode is relative
+  @info readdir(folder, join=true)
+  paths = sort(readdir(folder, join=true))
+  @info paths
+  buffer = IOBuffer()
+
+  for path in paths
+    if !endswith(path, ".md") || endswith(path, "index.md")
+      continue
+    end
+
+    # Replace ".md" with /, urls are of the form /devlogs/filename/
+    new_path = "/" * replace(path, ".md" => "/")
+    firstline = replace(readline(path), "#" => "") |> strip
+    println(firstline)
+    println(buffer, "<a href=\"$new_path\"> $firstline </a>")
+    println(new_path)
+  end
+
+  result = String(take!(buffer))
+
+  return result
+end
