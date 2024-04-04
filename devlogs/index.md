@@ -2,4 +2,4 @@ Devlogs are where we keep track of engineering and general production of comind.
 
 Questions to [engineering@mindco.link](mailto:engineering@mindco.link).
 
-{{list_folder /devlogs}}
+{{list_folder "devlogs"}}
