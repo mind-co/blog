@@ -73,7 +73,6 @@ header .blog-name a {
   /* color: #a6a2a0; */
   /* No color here, so it will inherit from the parent */
   color: inherit;
-  text-decoration: none;
 }
 
 header li a:hover {
