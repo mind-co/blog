@@ -62,6 +62,12 @@
     <priority>0.5</priority>
 </url>
 <url>
+    <loc>https://blog.comind.me/devlogs/index.html</loc>
+    <lastmod>2024-04-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+</url>
+<url>
     <loc>https://blog.comind.me/posts/media/index.html</loc>
     <lastmod>2024-04-04</lastmod>
     <changefreq>monthly</changefreq>
