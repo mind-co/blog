@@ -19,10 +19,11 @@ function hfun_list_folder(folders)
   @info folders
   folder = folders[1] # because the shortcode is relative
   @info readdir(folder, join=true)
-  paths = sort(readdir(folder, join=true))
+  paths = sort(readdir(folder, join=true), rev=true)
   @info paths
   buffer = IOBuffer()
 
+  println(buffer, "<ul>")
   for path in paths
     if !endswith(path, ".md") || endswith(path, "index.md")
       continue
@@ -32,9 +33,10 @@ function hfun_list_folder(folders)
     new_path = "/" * replace(path, ".md" => "/")
     firstline = replace(readline(path), "#" => "") |> strip
     println(firstline)
-    println(buffer, "<a href=\"$new_path\"> $firstline </a>")
+    println(buffer, "<li><a href=\"$new_path\"> $firstline </a></li>")
     println(new_path)
   end
+  println(buffer, "</ul>")
 
   result = String(take!(buffer))
 
