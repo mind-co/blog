@@ -1,0 +1,216 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/libs/highlight/styles/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>devlog 2024-04-07, colang</title> <header> <div class=blog-name > <span style="font-size: medium;">this is the</span> <a href="/">co</a>mind <span style="font-size: medium;">blog</span> <br/> </div> <!-- <nav> <ul> <li><a href="/">Home</a> <li><a href="/menu1/">Code blocks</a> <li><a href="/menu2/">More goodies</a> <li><a href="/menu3/">Tags</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> --> </header> <div class=franklin-content ><h1 id=devlog_2024-04-07_colang ><a href="#devlog_2024-04-07_colang" class=header-anchor >devlog 2024-04-07, colang</a></h1> <p>I&#39;ve been vaguely working on a side project for Comind, <a href="https://github.com/mind-co/colang/">colang</a>, that&#39;s kind of one of the distant-future things I want on the platform.</p> <p><code>colang</code> is a domain-specific language &#40;DSL&#41; built in Julia. It&#39;s intended to provide a robust interface for building massive-scale language programs. A <strong>language program</strong> is a series of natural-language processes that perform aribtrarily complicated tasks, such as building a documentation website, retrieving a strongly-typed list of bullet point items, etc.</p> <p>Something I&#39;ve found myself needing a lot is a sequence of prompts for a language model, but structured to make it easy to work on very large language programs. There are tools like this, like <a href="https://www.langchain.com/">LangChain</a> or <a href="https://github.com/stanfordnlp/dspy">DSPy</a>. These are both great tools and you should use them, but they are not a first-class Julia experience and they probably won&#39;t be.</p> <p>So, I&#39;m making my own, and I&#39;m going to experiment with some design decisions. colang is intended to take a functional and strongly-typed approach to building language programs – you should <em>know</em> at the language level whether you are getting a <code>Yes</code>, a <code>No</code>, or a <code>Maybe</code> when you ask a question. Those are <em>types</em> that you can dispatch to different types of program.</p> <p>Here&#39;s an overview of my work this evening on colang.</p> <h2 id=the_goal ><a href="#the_goal" class=header-anchor >the goal</a></h2> <p>The goal of colang is to provide a way to build and manage a sequence of prompts for a language model, but structured to make it easy to work on very large language programs. </p> <p>Here&#39;s a small program I could imagine wanting to run:</p> <pre><code class="julia hljs"><span class=hljs-comment ># Get only non-empty thoughts</span>
+remove_empty(thoughts) = filter(t -&gt; !(t <span class=hljs-keyword >isa</span> Empty), thoughts)
+
+<span class=hljs-comment ># Extract tasks from the input text. meta_memory is memory</span>
+<span class=hljs-comment ># passed into the function from the caller, but extract_tasks</span>
+<span class=hljs-comment ># chooses not to use it.</span>
+<span class=hljs-keyword >function</span> extract_tasks(meta_memory::AbstractMemory, input_thought)
+    <span class=hljs-comment ># Memory for this</span>
+    memory = Stack(
+        <span class=hljs-comment ># Core thought</span>
+        Thought(<span class=hljs-string >&quot;I am responsible for extracting tasks from the input text.&quot;</span>), 
+
+        <span class=hljs-comment ># Thoughts to use for context</span>
+        ThoughtArray()
+    )
+
+    <span class=hljs-comment ># Ask if this input text contains at least one task.</span>
+    <span class=hljs-comment ># If not, return Empty.</span>
+    <span class=hljs-keyword >if</span> !contains_task(memory, input_thought)
+        <span class=hljs-keyword >return</span> Empty()
+    <span class=hljs-keyword >end</span>
+
+    <span class=hljs-comment ># If it does, return a list of tasks.</span>
+    tasks = TaskThought[]
+    <span class=hljs-keyword >while</span> <span class=hljs-literal >true</span>
+        <span class=hljs-comment ># Try to get the next task</span>
+        task = get_first_task(memory, input_thought)
+
+        <span class=hljs-comment ># If it&#x27;s empty, we&#x27;re done.</span>
+        <span class=hljs-keyword >if</span> task <span class=hljs-keyword >isa</span> Empty
+            <span class=hljs-keyword >break</span>
+        <span class=hljs-keyword >end</span>
+
+        <span class=hljs-comment ># Add the task to the memory, noting that we&#x27;ve already</span>
+        <span class=hljs-comment ># processed it. ProcessedTask here would be reduced in the prompt</span>
+        <span class=hljs-comment ># to say &quot;Already processed this, do not duplicate: &quot; or something </span>
+        <span class=hljs-comment ># similar.</span>
+        push!(memory.thoughts.thoughts, ProcessedThought(task))
+
+        <span class=hljs-comment ># Add the task to the list of tasks</span>
+        push!(tasks, task)
+    <span class=hljs-keyword >end</span>
+    <span class=hljs-keyword >return</span> remove_empty(tasks)
+<span class=hljs-keyword >end</span></code></pre> <p>Here, the <code>extract_tasks</code> function is a simple example of a voice &#40;there will be explicit types later for dispatching&#41;. It takes in an input text and returns a list of tasks. The <code>extract_tasks</code> function returns a list of <code>TaskThoughts</code>, which can further be dispatched. </p> <p>An example &#40;that doesn&#39;t work with the current design&#41;:</p> <pre><code class="julia hljs">tasks = extract_tasks(<span class=hljs-string >thought&quot;I need to buy a dog, a horse, and some bourbon.&quot;</span>)</code></pre>
+<p>should return</p>
+<pre><code class="julia hljs">TaskThought[
+    TaskThought(<span class=hljs-string >&quot;Buy a dog&quot;</span>),
+    TaskThought(<span class=hljs-string >&quot;Buy a horse&quot;</span>),
+    TaskThought(<span class=hljs-string >&quot;Buy some bourbon&quot;</span>)
+]</code></pre>
+<p>Each of these of course could be used elsewhere. For example, if you are working on planning problems, you could do something like</p>
+<pre><code class="julia hljs">memory = Stack(
+    <span class=hljs-comment ># Core goal</span>
+    Thought(<span class=hljs-string >&quot;&quot;&quot;
+    I am responsible for planning a trip to the grocery store. I need
+    to plan out a series of tasks to get the items I need.
+    &quot;&quot;&quot;</span>),
+    <span class=hljs-comment ># Tasks</span>
+    ThoughtArray([])
+)
+
+<span class=hljs-comment ># Ask the language model to start planning</span>
+plan_thought = plan(
+    memory, <span class=hljs-string >&quot;&quot;&quot;
+    What do I need to know to plan a trip to the grocery store?
+    &quot;&quot;&quot;</span>
+)
+
+<span class=hljs-comment ># Get the list of tasks from the plan</span>
+task_list = ask(
+    memory,
+    plan_thought
+)
+
+<span class=hljs-comment ># Go through each task and ask the language model to perform it</span>
+<span class=hljs-keyword >for</span> task <span class=hljs-keyword >in</span> task_list
+    <span class=hljs-comment ># do more stuff with the task</span>
+    <span class=hljs-comment ># . . .</span>
+<span class=hljs-keyword >end</span></code></pre>
+<h2 id=abstract_types ><a href="#abstract_types" class=header-anchor >abstract types</a></h2>
+<p>Currently there are three abstract types, <code>AbstractThought</code>, <code>AbstractMemory</code>, and <code>AbstractVoice</code>. The <code>AbstractVoice</code> stuff isn&#39;t ready yet but I know it&#39;ll be part of the design.</p>
+<pre><code class="julia hljs"><span class=hljs-comment >#</span>
+<span class=hljs-comment ># ████████╗██╗   ██╗██████╗ ███████╗███████╗</span>
+<span class=hljs-comment ># ╚══██╔══╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔════╝</span>
+<span class=hljs-comment >#    ██║    ╚████╔╝ ██████╔╝█████╗  ███████╗</span>
+<span class=hljs-comment >#    ██║     ╚██╔╝  ██╔═══╝ ██╔══╝  ╚════██║</span>
+<span class=hljs-comment >#    ██║      ██║   ██║     ███████╗███████║</span>
+<span class=hljs-comment >#    ╚═╝      ╚═╝   ╚═╝     ╚══════╝╚══════╝</span>
+<span class=hljs-comment ># </span>
+<span class=hljs-comment ># (abstract ones)</span>
+<span class=hljs-comment ># </span>
+<span class=hljs-string >&quot;&quot;&quot;
+An `AbstractThought` is a thought that is accepted or send by a voice.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >abstract type</span> AbstractThought <span class=hljs-keyword >end</span>
+
+<span class=hljs-string >&quot;&quot;&quot;
+An `AbstractMemory` is a memory that is something you should take into
+account when you are thinking about during your process.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >abstract type</span> AbstractMemory <span class=hljs-keyword >end</span>
+
+<span class=hljs-string >&quot;&quot;&quot;
+An `AbstractVoice` is a function mapping an input thought to an output thought.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >abstract type</span> AbstractVoice <span class=hljs-keyword >end</span></code></pre>
+<h3 id=thoughts ><a href="#thoughts" class=header-anchor >thoughts</a></h3>
+<pre><code class="julia hljs"><span class=hljs-comment >#</span>
+<span class=hljs-comment ># ████████╗██╗  ██╗ ██████╗ ██╗   ██╗ ██████╗ ██╗  ██╗████████╗</span>
+<span class=hljs-comment ># ╚══██╔══╝██║  ██║██╔═══██╗██║   ██║██╔════╝ ██║  ██║╚══██╔══╝</span>
+<span class=hljs-comment >#    ██║   ███████║██║   ██║██║   ██║██║  ███╗███████║   ██║   </span>
+<span class=hljs-comment >#    ██║   ██╔══██║██║   ██║██║   ██║██║   ██║██╔══██║   ██║   </span>
+<span class=hljs-comment >#    ██║   ██║  ██║╚██████╔╝╚██████╔╝╚██████╔╝██║  ██║   ██║   </span>
+<span class=hljs-comment >#    ╚═╝   ╚═╝  ╚═╝ ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝   ╚═╝   </span>
+<span class=hljs-comment >#                                                             </span>
+<span class=hljs-comment ># Little bits of information.</span>
+<span class=hljs-comment >#</span></code></pre>
+<p><code>AbstractThought</code> captures a &quot;unit of information&quot;. This can be numbers, strings, images, URLs, etc. Each type of thought has its own subtype. Some examples:</p>
+<ul>
+<li><p><code>Thought</code> is a string but has no special information. These can be dispatched in standard Julia.</p>
+
+<li><p><code>Empty</code> is when a thought is empty. The voice was not able to perform the task, or the task was not possible. This is akin to a &quot;stop thought&quot;, because usually an <code>Empty</code> implies that a voice chain can be terminated.</p>
+
+<li><p><code>NumberThought</code> contains any numeric type, which can be useful for numeric operations that a voice may wish to perform.</p>
+
+<li><p><code>AbstractCategoricalThought</code> contains a few subtypes that are useful for categorizing things:</p>
+
+</ul>
+<pre><code class="julia hljs"><span class=hljs-string >&quot;&quot;&quot;
+`AbstractCategoricalThought` is a thought that can be categorized.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >abstract type</span> AbstractCategoricalThought &lt;: AbstractThought <span class=hljs-keyword >end</span>
+
+<span class=hljs-string >&quot;&quot;&quot;
+YesNoMaybe is a categorical type that can be used to represent
+yes, no, or maybe.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >abstract type</span> YesNoMaybe &lt;: AbstractCategoricalThought <span class=hljs-keyword >end</span>
+<span class=hljs-keyword >struct</span> Yes &lt;: YesNoMaybe <span class=hljs-keyword >end</span>
+<span class=hljs-keyword >struct</span> No &lt;: YesNoMaybe <span class=hljs-keyword >end</span>
+<span class=hljs-keyword >struct</span> Maybe &lt;: YesNoMaybe <span class=hljs-keyword >end</span></code></pre>
+<p><code>Yes</code>, <code>No</code>, and <code>Maybe</code> are the most common subtypes of <code>AbstractCategoricalThought</code>, and are intended to make it easy to work with cases where you ask the language model:</p>
+<blockquote>
+<p>User: Is water blue?</p>
+</blockquote>
+<blockquote>
+<p>AI: Yes, water is usually blue.</p>
+</blockquote>
+<p>In this case we want to determine that this is in fact probably a <code>Yes</code>, which can either be done via structured text extraction or by simple feedback-loops &#40;i.e. &quot;sorry that is not yes/no, please respond only with &quot;yes&quot; or &quot;no&quot;.&#41;</p>
+<p>Thoughts are intended to be passed up and down the train of thought. Think of them as variables or values in a standard programming language – this one just happens to be an attempt to extract a bullet-pointed list. </p>
+<h2 id=memory ><a href="#memory" class=header-anchor >memory</a></h2>
+<p>I also included some memory types which are useful for managing the context of a language model call. RAG &#40;retrieval augmented generation&#41; is basically the best way to get performance out of your lagnuage models, and so I want different tasks to be able to share relevant information with each other. </p>
+<pre><code class="julia hljs"><span class=hljs-comment >#</span>
+<span class=hljs-comment ># ███╗   ███╗███████╗███╗   ███╗ ██████╗ ██████╗ ██╗   ██╗</span>
+<span class=hljs-comment ># ████╗ ████║██╔════╝████╗ ████║██╔═══██╗██╔══██╗╚██╗ ██╔╝</span>
+<span class=hljs-comment ># ██╔████╔██║█████╗  ██╔████╔██║██║   ██║██████╔╝ ╚████╔╝ </span>
+<span class=hljs-comment ># ██║╚██╔╝██║██╔══╝  ██║╚██╔╝██║██║   ██║██╔══██╗  ╚██╔╝  </span>
+<span class=hljs-comment ># ██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║╚██████╔╝██║  ██║   ██║   </span>
+<span class=hljs-comment ># ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝   </span>
+<span class=hljs-comment ># </span>
+<span class=hljs-comment ># Everything you need to manage what you know.</span>
+<span class=hljs-comment >#</span>
+
+<span class=hljs-string >&quot;&quot;&quot;
+`BlankSlate` is a memory that is empty. No information can be added
+or removed to it. Please create a [`Stack`](@ref) if you need to
+store information.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >struct</span> BlankSlate &lt;: AbstractMemory <span class=hljs-keyword >end</span></code></pre>
+<p><code>BlankSlate</code> is the most common memory type, and is the default memory type for a language model call. It is empty, and cannot be used for storage. Passing <code>BlankSlate</code> to a voice means that it has no context and can only respond by itself.</p>
+<p>An interesting thing to explore in language programming in general is how to allow voices and thoughts to share context and pass messages between them while making sure that certain voices are not permitted to access information that they should not have.</p>
+<p>As a motivating example, consider a voice chain <code>A -&gt; B -&gt; C</code>. <code>A</code> has passed information to <code>B</code> that is not relevant for <code>C</code>. We don&#39;t want <code>C</code> to see the information because it may confuse <code>C</code>, or, in the case of sensitive information, contaminate the chain with knowledge of something we did not want it to know.</p>
+<p>An early step there is <code>BlankSlate</code> – if <code>B</code> receives information from <code>A</code> and passes a <code>BlankSlate</code> to <code>C</code>, then <code>C</code> will effectively be sandboxed to an independet process.</p>
+<p>I also made a <code>Stack</code>, which is a more flexible, mutable memory structure. A <code>Stack</code> is composed of two parts:</p>
+<ol>
+<li><p>A <code>core</code> thought, which is the most important part of the <code>Stack</code>. This is the thought that will be passed to the language model when it is asked to perform a task. <code>core</code> is intended to be used when dictating the entire flow of a program or local memory space &#40;defined as <code>AbstractMemory</code> shared by voices in the memory space&#41; by describing the top-level task so that the voice can tailor its response to the ultimate goal of a memory space.</p>
+
+<li><p>A <code>thoughts</code> array, which is the stack of thoughts. This is the actual data that the language model will be working with. Voices can add and remove thoughts to this array as needed as a way of passing messages to one another, or to provide general context to all voices in the memory space</p>
+
+</ol>
+<pre><code class="julia hljs"><span class=hljs-string >&quot;&quot;&quot;
+`ThoughtArray` is a vector of thoughts.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >mutable struct</span> ThoughtArray{A&lt;:<span class=hljs-built_in >Vector</span>{AbstractThought}} &lt;: AbstractMemory
+    thoughts::A
+<span class=hljs-keyword >end</span>
+
+<span class=hljs-string >&quot;&quot;&quot;
+A `Stack` memory has a vector of thoughts. You can push thoughts onto the stack
+and pop thoughts from the stack.
+
+There is an optional `core` thought that is used to guide all processes, 
+in the memory. All users of a `Stack` memory will have `core` prepended
+to the final prompts.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >mutable struct</span> Stack{A,B&lt;:ThoughtArray} &lt;: AbstractMemory
+    core::A
+    thoughts::B
+<span class=hljs-keyword >end</span></code></pre>
+<p>I&#39;m enjoying the process. Good to take a break from the nuts-and-bolts of comind and work on something kind of goofy and fun.</p>
+<p>– cameron</p>
+
+    
+
+<div class=page-foot >
+    mindco © 
+   thanks to <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
+<br/>
+</div>
+</div>
+
+
+    
+    
+        <script src="/libs/highlight/highlight.min.js"></script>
+<script>hljs.highlightAll();hljs.configure({tabReplace: '    '});</script>
