@@ -242,12 +242,14 @@ td {
 .franklin-content a {
   color: var(--text-color);
   text-decoration: underline;
-  text-decoration-color: var(--tertiary-color);
+  text-decoration-color: var(--secondary-color);
 }
 
 .franklin-content a:hover {
-  text-decoration: underline;
-  text-decoration-color: var(--tertiary-color);
+  border-radius: 5px;
+  background-color: var(--primary-color);
+  text-decoration: none;
+  /* text-decoration-color: var(--primary-color); */
 }
 
 /* ==================================================================
