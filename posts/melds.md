@@ -1,10 +1,10 @@
 @def hasdisqus = true
 
-# brainstacks
+# melds
 
 Hey there! It's Cameron.
 
-This evening I wrote up a lot of the infrastructure for what I'm calling "brainstacks". I'm not sure if that's the best name for it, but it's what I'm going with for now.
+This evening I wrote up a lot of the infrastructure for what I'm calling "melds". I'm not sure if that's the best name for it, but it's what I'm going with for now.
 
 Brain stacks are basically folders of thoughts, bookmarks of a particular order of thoughts. You could
 imagine recipes, diaries and journals, pictures of cats, etc. At the bottom of the stack is a text box
@@ -20,9 +20,9 @@ dogs are, I can pull up this dog picture I saw a few weeks ago that was insanely
 
 Anyway. I'm excited.
 
-## A little more on brainstacks
+## A little more on melds
 
-The idea of a brainstack is to be able to save a series of links in a single direction, i.e. if you linked
+The idea of a meld is to be able to save a series of links in a single direction, i.e. if you linked
 
 ```
 A -> B -> C

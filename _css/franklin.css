@@ -6,7 +6,7 @@
   --block-background: hsl(0, 0%, 7%);
   --output-background: hsl(0, 0%, 0%);
   --small: 14px;
-  --normal: 19px;
+  --normal: 1rem;
   --text-color: hsl(0, 0%, 83%);
   /* --text-color: hsv(100, 0%, 20%); */
 }
@@ -19,7 +19,7 @@ html {
   font-family: "lexend", monospace;
   font-size: var(--normal);
   color: var(--text-color);
-  font-weight: 300;
+  font-weight: 400;
 }
 
 /* ==================================================================
@@ -224,7 +224,6 @@ td {
   border-left: 7px solid #a8a8a8;
   margin: 1.5em 10px;
   padding: 0.5em 10px;
-  font-style: italic;
 }
 
 .franklin-content blockquote p {
@@ -243,11 +242,12 @@ td {
 .franklin-content a {
   color: var(--text-color);
   text-decoration: underline;
+  text-decoration-color: var(--tertiary-color);
 }
 
 .franklin-content a:hover {
   text-decoration: underline;
-  text-decoration-color: var(--secondary-color);
+  text-decoration-color: var(--tertiary-color);
 }
 
 /* ==================================================================
