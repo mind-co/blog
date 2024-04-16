@@ -29,4 +29,8 @@ Andrej Karpathy [tweeted](https://twitter.com/karpathy/status/176650914929718927
 
 A goal for comind is to make it easier to think critically about the information we consume. I want to provide an easy way to contextualize what you're looking at, and to make sure that we show you only what is meaningful, informative, and helpful.
 
+## fixing the collective trap
 
+[When Product Markets Become Collective Traps: The Case of Social Media](https://www.nber.org/papers/w31771), thanks to https://x.com/MarMaSchneider/status/1780091433199784356
+
+[writeup to come]
