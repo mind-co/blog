@@ -7,7 +7,7 @@
   --output-background: hsl(0, 0%, 0%);
   --small: 14px;
   --normal: 1rem;
-  --text-color: hsl(0, 0%, 83%);
+  --text-color: hsl(0, 0%, 100%);
   /* --text-color: hsv(100, 0%, 20%); */
 }
 
@@ -164,7 +164,6 @@ h6 {
 }
 .franklin-content h1 a:hover {
   text-decoration: none;
-  color: var(--secondary-color);
 }
 .franklin-content h2 a {
   text-decoration: none !important;
@@ -172,7 +171,6 @@ h6 {
 }
 .franklin-content h2 a:hover {
   text-decoration: none;
-  color: var(--secondary-color);
 }
 .franklin-content h3 a {
   text-decoration: none !important;
@@ -206,6 +204,8 @@ h6 {
   margin-right: auto;
   border-collapse: collapse;
   text-align: center;
+  color: var(--text-color);
+  background-color: var(--block-background);
 }
 
 .franklin-toc ol ol {
@@ -242,14 +242,19 @@ td {
 .franklin-content a {
   color: var(--text-color);
   text-decoration: underline;
+  font-weight: bold;
   text-decoration-color: var(--secondary-color);
 }
 
 .franklin-content a:hover {
-  border-radius: 5px;
-  background-color: var(--primary-color);
-  text-decoration: none;
-  /* text-decoration-color: var(--primary-color); */
+  /* background-color: var(--primary-color); */
+  text-decoration: underline;
+  text-decoration-thickness: 6px;
+  text-underline-offset: 0px;
+  /* text-decoration-style: wavy; */
+  /* text-underline-position: auto; */
+  text-decoration-color: var(--primary-color);
+  text-underline-position: under;
 }
 
 /* ==================================================================
@@ -272,17 +277,24 @@ td {
 .franklin-content table.fndef {
   margin: 0;
   margin-bottom: 10px;
+  border: none;
 }
 
 .franklin-content .fndef tr,
 td {
   padding: 0;
-  border: 0;
+  border: none;
   text-align: left;
 }
 
+.franklin-content .tbody,
+td {
+  background-color: var(--block-background);
+  border: none;
+}
+
 .franklin-content .fndef tr {
-  border-left: 2px solid lightgray;
+  border: none;
 }
 
 .franklin-content .fndef td.fndef-backref {
