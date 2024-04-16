@@ -89,6 +89,8 @@ blogposts = hfun_blogposts()
 
 # think good thoughts
 
+go [here](/posts/what-is-comind) for the current best description of what comind is.
+
 if you go to the main site ([comind.me](https://comind.me)) you will be disappointed. comind doesn't work yet, sorry 🤙. we'll keep you updated. i guess that means you can't think good thoughts. well, you can think them somewhere else. i hear the outdoors are nice.
 
 oh well, life presses on.
