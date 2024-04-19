@@ -242,15 +242,14 @@ td {
 .franklin-content a {
   color: var(--text-color);
   text-decoration: underline;
-  font-weight: bold;
   text-decoration-color: var(--secondary-color);
 }
 
 .franklin-content a:hover {
   /* background-color: var(--primary-color); */
   text-decoration: underline;
-  text-decoration-thickness: 6px;
-  text-underline-offset: 0px;
+  text-decoration-thickness: 3px;
+  text-underline-offset: -2px;
   /* text-decoration-style: wavy; */
   /* text-underline-position: auto; */
   text-decoration-color: var(--primary-color);
