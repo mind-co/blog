@@ -23,11 +23,18 @@ mintoclevel = 2
 ignore = ["node_modules/"]
 
 # RSS (the website\_{title, descr, url} must be defined to get RSS)
-
-generate_rss = true
 website_title = "The Comind Blog"
 website_descr = "trying to think good thoughts"
 website_url = "https://blog.comind.me/"
+
+# NOt clear whether i need both website_* and rss_* variables.
+# https://franklinjl.org/syntax/rss/#global_configuration
+generate_rss = true
+rss_website_title = website_title
+rss_website_descr = website_descr
+rss_website_url   = website_url
+rss_full_content = true
+
 +++
 
 <!--
