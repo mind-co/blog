@@ -1,0 +1,200 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/libs/highlight/styles/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/basic.css"> <link rel=icon  href="/assets/favicon.png"> <title>devlog 2024-05-04, bit-representations for graph vertices</title> <header> <div class=blog-name > <span style="font-size: medium;">this is the</span> <a href="/">co</a>mind <span style="font-size: medium;">blog</span> <br/> </div> <!-- <nav> <ul> <li><a href="/">Home</a> <li><a href="/menu1/">Code blocks</a> <li><a href="/menu2/">More goodies</a> <li><a href="/menu3/">Tags</a> </ul> <img src="/assets/hamburger.svg" id=menu-icon > </nav> --> </header> <div class=franklin-content ><h1 id=devlog_2024-05-04_bit-representations_for_graph_vertices ><a href="#devlog_2024-05-04_bit-representations_for_graph_vertices" class=header-anchor >devlog 2024-05-04, bit-representations for graph vertices</a></h1> <p>Lots of fun stuff today&#33; It was rainy for a lot of the morning after my regatta, so I managed to cozy up and do some programming without getting too much sunshine-FOMO.</p> <p>In the evening I did actual comind work, and the first part of the day was mostly fucking around with bit-representations for graph databases. I&#39;ll do the comind stuff first and then a brief recap of the graph database work.</p> <h2 id=comind_work ><a href="#comind_work" class=header-anchor >comind work</a></h2> <p>I&#39;m adding an endpoint to the server called <code>examine</code>. When you <code>examine</code> a thought, it is a way focusing your attention on a particular piece of content to uncover more information about it.Examinations are essentially detail views of thoughts. </p> <p>There&#39;s a few ways I&#39;m imagining this working. Examinations should show you</p> <ol> <li><p>Directly linked thoughts, i.e. parents, children, replies, etc.</p> <li><p>A brief description of the surrouding context, i.e. &quot;your friends saw this and have been discussing why you would say something so stupid, in a loving way&quot;. </p> <li><p>Suggested thoughts that are not linked but seem to be related.</p> </ol> <p>I have &#40;1&#41; done, &#40;3&#41; is easy enough but not done, and &#40;2&#41; is where I spent most of the evening.</p> <p>It turns out that contextualizing a &quot;web&quot; of thoughts for language models is not super easy, at least not from a prompt engineering side. I&#39;ve settled for beginning to specify a text format for describing general context and relationships between thoughts.</p> <p>When you <code>examine</code> a thought, I go and pull the &quot;neighborhood&quot; of thoughts surrouding your primary thought within some nmber of hops. For example, if I pulled in all thoughts within two hops of <code>A</code> and was looking at a link chain <code>A -&gt; B -&gt; C -&gt; D</code>, I would pull in <code>A</code>, <code>B</code>, and <code>C</code>. </p> <p>Then, I need to dump the content of each of those thoughts into a query to provide to the language model. The way this is starting to form is to provide the language model a new comind-specific markup language that feels very 1970.</p> <p>Thoughts are wrapped in <em>blocks</em> that include some variables describing interrelationships and annotating specific content.</p> <p>Here is the block for the <strong>primary thought</strong>. When you <code>examine</code> a thought, you are making that thought &quot;primary&quot;.</p> <p>Here&#39;s something I might write, and how it is rendered in the context prompt:</p> <pre><code class="julia hljs">&lt;BEGIN PRIMARY THOUGHT BY=cameron&gt;
+here&#x27;s some notes i wrote about language models
+&lt;END PRIMARY THOUGHT&gt;</code></pre> <p>Within the same prompt, you can optionally include <em>context</em> thoughts that the language model is instructed to review only if relevant to the primary thought. If the thought is in the neighborhood, a <code>HOPS&#61;&#91;number&#93;</code> field is included to suggest to the model that it is more likely to be relevant.</p> <pre><code class="julia hljs">&lt;BEGIN THOUGHT HOPS=<span class=hljs-number >1</span> BY=cameron&gt;
+language models tend to hallucinate, so it&#x27;s important to provide context that is relevant to the primary thought.
+&lt;END THOUGHT&gt;</code></pre> <p>Your context window would basically be as full as possible of related thoughts, and then I leave it up to the model to determine what is most relevant for the answer. To determine what I actually want from the model, I found it to help by adding a <code>REQUEST</code> block:</p> <pre><code class="julia hljs">&lt;BEGIN REQUEST&gt;
+can you please tell me what i know about language models?
+&lt;END REQUEST&gt;</code></pre> <p>This whole thing is vaguely hacky, but ideally I could specify a fairly robust markup language for describing context and relationships between thoughts, and then fine-tune models to understand the syntax. More on it later.</p> <p>Anyway, the endpoint is kinda done but I broke the fuck out of the embedding system so all of comind is broken&#33; Living the dream.</p> <h2 id=graph_database_work ><a href="#graph_database_work" class=header-anchor >graph database work</a></h2> <p>I also fucked around with graph databases. Today&#39;s thing was to see how binary representations of entities, relationships, and properties work.</p> <p>To rephrase – how the fuck do you actually store a node on disk in an efficient way? Neo4j stores nodes as fixed-length 15 byte chunks:</p> <ul> <li><p>The first byte checks whether the record is in use or can be re-used. Apparently this is called a &quot;tombstone&quot;, thanks to my brother Q for the tip.</p> <li><p>The next four bytes contain the ID of the first relationship connected to the node.</p> <li><p>The following four contain the ID of the first property connected to the node.</p> <li><p>Five store labels references &#40;i.e. Person, or Car&#41;, but they can be inlined apparently if there&#39;s a small number.</p> <li><p>Final byte reserved for some future use.</p> </ul> <p>I wanted to play around with this, so I wrote some code. My graph specification only has nodes for now, but I&#39;ve made a few alternative choices:</p> <ol> <li><p>A tombstone byte.</p> <li><p>An N-byte ID for the node.</p> <li><p>An N-byte ID for the relationship splay tree. </p> <li><p>An N-byte ID for the property splay tree.</p> <li><p>An N-byte ID for the location of the node&#39;s embedding vector, or a pointer to the splay tree if different embedding models are used.</p> </ol> <p>IDs 3-5 are &quot;pointers&quot; in that they refer to positions in storage files containing another fixed-length record. More on the splay trees later, haven&#39;t figured them out yet.</p> <p>N here is probably 128, which is big, but I&#39;m still trying to figure out how you support ordered records that are compact and easy to handle in a distributed format. I settled on ULIDs, which are 128-bit and hardened to prevent collisions across distributed systems. </p> <p>Here&#39;s how you specify the format of the storage system.</p> <ul> <li><p><code>ID_TYPE</code> is the type of the ID – how many bytes it takes to represent the ID. Here it&#39;s a 2-byte ID.</p> <li><p><code>ID_SIZE_BYTES</code> is the number of bytes in the ID.</p> <li><p><code>NODE_RECORD_SIZE</code> is the number of bytes in the node record – four IDs and a tombstone byte.</p> <li><p><code>BLOCK_SIZE</code> is the number of records per partition file. A partition file is just a file on disk with the format <code>node.&#91;partition&#93;.dat</code>.</p> </ul> <pre><code class="julia hljs"><span class=hljs-keyword >const</span> ID_TYPE = <span class=hljs-built_in >UInt16</span>
+<span class=hljs-keyword >const</span> ID_SIZE_BYTES = sizeof(ID_TYPE)
+<span class=hljs-keyword >const</span> NODE_RECORD_SIZE = <span class=hljs-number >1</span> + ID_SIZE_BYTES * <span class=hljs-number >4</span>
+<span class=hljs-keyword >const</span> BLOCK_SIZE = <span class=hljs-number >2</span> <span class=hljs-comment ># Records per partition file</span></code></pre> <p>In a simpler version of this, say where we only have 1-bit IDs and a block size of 2, then the binary representation of each partition file looks like</p> <pre><code class="julia hljs"><span class=hljs-number >10000</span> <span class=hljs-comment ># First record, tombstone is set</span>
+<span class=hljs-number >00000</span> <span class=hljs-comment ># Second record, tombstone is not set</span></code></pre> <p>and so on.</p> <p>Anyway. Now we need to do some byte representation stuff. Most of the shit on your machine is bytes and thus so is the code, and working with raw bits and casting up to <code>UInt128</code> or whatever all the time sucks. So I made <code>ByteArray</code>, which just wraps around a <code>Vector&#123;UInt8&#125;</code> and lets you treat it like a standard array but supports offset indexing.</p> <pre><code class="julia hljs"><span class=hljs-keyword >struct</span> ByteArray
+    bits::<span class=hljs-built_in >Vector</span>{<span class=hljs-built_in >UInt8</span>}
+<span class=hljs-keyword >end</span>
+
+<span class=hljs-comment ># Standard interface implementations</span>
+Base.length(b::ByteArray) = length(b.bits) * <span class=hljs-number >8</span>
+Base.firstindex(b::ByteArray) = <span class=hljs-number >1</span>
+Base.lastindex(b::ByteArray) = length(b.bits) * <span class=hljs-number >8</span>
+Base.getindex(b::ByteArray, i::<span class=hljs-built_in >Int</span>) = b.bits[<span class=hljs-number >8</span>i-<span class=hljs-number >1</span>:<span class=hljs-number >8</span>i]
+Base.setindex(b::ByteArray, v::<span class=hljs-built_in >Vector</span>{<span class=hljs-built_in >UInt8</span>}, i::<span class=hljs-built_in >Int</span>) = b.bits[<span class=hljs-number >8</span>i-<span class=hljs-number >1</span>:<span class=hljs-number >8</span>i] = v</code></pre> <p>We now need to be able to convert an array of bytes to whatever the root ID type is, and vice versa. For example, if I have a <code>UInt16</code> ID type, then I need to be able to convert to <code>UInt8</code> values into a <code>UInt16</code> ID.</p> <pre><code class="julia hljs">id2bytes(x) = reinterpret(<span class=hljs-built_in >UInt8</span>, [x])
+bytes2id(x) = reinterpret(ID_TYPE, x) |&gt; only <span class=hljs-comment ># TODO not clear on why this returns a single vector</span></code></pre> <p>The <code>ByteVector</code> representation of an ID is just a vector of bytes, like so:</p> <pre><code class="julia hljs"><span class=hljs-number >2</span>-element <span class=hljs-built_in >Vector</span>{<span class=hljs-built_in >UInt8</span>}:
+ <span class=hljs-number >0x41</span>
+ <span class=hljs-number >0x3b</span></code></pre> <p>but converts to the <code>UInt16</code> ID type when you use <code>bytes2id</code>:</p> <pre><code class="julia hljs"><span class=hljs-number >0x3b41</span></code></pre>
+<p>Let&#39;s bundle these up into a node record, which stores all the different IDs it tracks, as well as some constructors.</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >struct</span> NodeRecord{BV}
+    tombstone::<span class=hljs-built_in >UInt8</span>
+    id::BV
+    relationships::BV
+    properties::BV
+    vector::BV
+<span class=hljs-keyword >end</span>
+
+<span class=hljs-keyword >function</span> NodeRecord(tombstone::<span class=hljs-built_in >Bool</span>, id, relationships, properties, vector)
+    NodeRecord(tombstone, id2bytes(id), id2bytes(relationships), id2bytes(properties), id2bytes(vector))
+<span class=hljs-keyword >end</span>
+
+<span class=hljs-keyword >function</span> NodeRecord(bytes::<span class=hljs-built_in >Vector</span>{<span class=hljs-built_in >UInt8</span>})
+    tombstone = bytes[<span class=hljs-number >1</span>]
+    id = bytes[<span class=hljs-number >2</span>]
+    relationships = bytes[<span class=hljs-number >3</span>]
+    properties = bytes[<span class=hljs-number >4</span>]
+    vector = bytes[<span class=hljs-number >5</span>]
+    NodeRecord(tombstone, id, relationships, properties, vector)
+<span class=hljs-keyword >end</span></code></pre>
+<p>We know which partition file the record belongs to by it&#39;s ID. Only <code>BLOCK_SIZE</code> records are stored in a partition file, and the IDs of the records in the file are sequential. If we have IDs 1,2,3, and 4 and a block size of 2, then 1 and 2 would be in partition 1, 3 and 4 would be in partition 2. </p>
+<p><code>whichpartition</code> is a function that takes an ID and returns the partition file it belongs to.</p>
+<pre><code class="julia hljs"><span class=hljs-string >&quot;&quot;&quot;
+    whichpartition(id)
+
+Determine which partition file a given ID belongs to. Partitions are of size BLOCK_SIZE nodes.
+An ID of 1 through BLOCK_SIZE belongs to partition 1, BLOCK_SIZE+1 through 2*BLOCK_SIZE belongs to partition 2, etc.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >function</span> whichpartition(byteid)
+    <span class=hljs-keyword >return</span> div(bytes2id(byteid) - <span class=hljs-number >1</span>, BLOCK_SIZE) + <span class=hljs-number >1</span>
+<span class=hljs-keyword >end</span>
+
+<span class=hljs-comment ># Also get the name of the file we&#x27;ll write/read to.</span>
+datafile(n::NodeRecord) = <span class=hljs-string >&quot;node.<span class=hljs-subst >$(whichpartition(n.id)</span>).dat&quot;</span></code></pre>
+<p>We also know that, within a binary file, we can skip ahead to where the record is if we know its ID. <code>recordstart</code> is a function that takes an ID and returns the start of the record <em>within</em> a partition file. In the above example, if I have a record with ID 3, then the record starts at the 6th byte of the file if records are five-bytes long. The whole file is 12 bytes.</p>
+<pre><code class="julia hljs"><span class=hljs-string >&quot;&quot;&quot;
+    recordstart(id)
+
+Determine the start of a record within a partition file. Records are of size NODE_RECORD_SIZE,
+so a record starts at a multiple of NODE_RECORD_SIZE. 
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >function</span> recordstart(byteid)
+    <span class=hljs-keyword >return</span> mod(bytes2id(byteid) - <span class=hljs-number >1</span>, BLOCK_SIZE) * NODE_RECORD_SIZE
+<span class=hljs-keyword >end</span></code></pre>
+<p>Next we want to convert a <code>NodeRecord</code> to a byte array so we can write it to disk.</p>
+<pre><code class="julia hljs"><span class=hljs-string >&quot;&quot;&quot;
+    bytes(id)
+
+Node storage contains a leading byte indicating whether the node is active.
+It is followed by the 128-bit node ID.
+Then are 128-bit IDs for each of the relationship, properties, and vector files.
+
+`bytes` converts a `NodeRecord` to a byte array.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >function</span> bytes(n::NodeRecord)
+    <span class=hljs-keyword >return</span> vcat(
+        <span class=hljs-built_in >UInt8</span>(n.tombstone),
+        n.id,
+        n.relationships,
+        n.properties,
+        n.vector
+    )
+<span class=hljs-keyword >end</span></code></pre>
+<p>This gets used here, where we write a <code>NodeRecord</code> to the partition file it belongs to:</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >function</span> save(n::NodeRecord)
+    <span class=hljs-comment ># Get the partition file</span>
+    partition = whichpartition(n.id)
+    filename = datafile(n)
+
+    <span class=hljs-comment ># If the partition file does not exist, create it. Fill the whole BLOCK_SIZE</span>
+    <span class=hljs-comment ># with zeros to make the file size a multiple of BLOCK_SIZE.</span>
+    <span class=hljs-keyword >if</span> !isfile(filename)
+        open(filename, <span class=hljs-string >&quot;w&quot;</span>) <span class=hljs-keyword >do</span> f
+            write(f, zeros(<span class=hljs-built_in >UInt8</span>, NODE_RECORD_SIZE * BLOCK_SIZE))
+        <span class=hljs-keyword >end</span>
+    <span class=hljs-keyword >else</span>
+        <span class=hljs-comment ># Check that the partition file is of the correct size</span>
+        <span class=hljs-keyword >if</span> filesize(filename) != NODE_RECORD_SIZE * BLOCK_SIZE
+            <span class=hljs-meta >@error</span> <span class=hljs-string >&quot;Partition file is not the correct size&quot;</span> filename filesize(filename) NODE_RECORD_SIZE * BLOCK_SIZE
+        <span class=hljs-keyword >end</span>
+    <span class=hljs-keyword >end</span>
+
+    <span class=hljs-comment ># Write the record</span>
+    open(filename, append=<span class=hljs-literal >true</span>) <span class=hljs-keyword >do</span> f
+        seek(f, recordstart(n.id))
+        write(f, bytes(n))
+    <span class=hljs-keyword >end</span>
+<span class=hljs-keyword >end</span></code></pre>
+<p>To unpack this briefly:</p>
+<ol>
+<li><p>Get the partition file to write to.</p>
+
+<li><p>If the partition file does not exist, create it. Fill the whole <code>BLOCK_SIZE</code> with zeros to make the file size a multiple of <code>BLOCK_SIZE</code>.</p>
+
+<li><p>Write the record to the partition file at its location &#40;we go to the record start spot using <code>seek</code>&#41;.</p>
+
+</ol>
+<p>Then, lastly, we can load the record back using</p>
+<pre><code class="julia hljs"><span class=hljs-string >&quot;&quot;&quot;
+    node_record(id)
+
+Load a `NodeRecord` from the file system.
+&quot;&quot;&quot;</span>
+<span class=hljs-keyword >function</span> node_record(id)
+    partition = whichpartition(id)
+    filename = <span class=hljs-string >&quot;node.<span class=hljs-variable >$partition</span>.dat&quot;</span>
+    open(filename, <span class=hljs-string >&quot;r&quot;</span>) <span class=hljs-keyword >do</span> f
+        seek(f, recordstart(id))
+        read(f, NODE_RECORD_SIZE)
+    <span class=hljs-keyword >end</span>
+<span class=hljs-keyword >end</span></code></pre>
+<p>Voila&#33;</p>
+<p>Now, the following works:</p>
+<pre><code class="julia hljs">julia&gt; id1 = rand(<span class=hljs-built_in >UInt8</span>, ID_SIZE_BYTES)
+<span class=hljs-number >2</span>-element <span class=hljs-built_in >Vector</span>{<span class=hljs-built_in >UInt8</span>}:
+ <span class=hljs-number >0x63</span>
+ <span class=hljs-number >0xad</span>
+
+julia&gt; id2 = rand(<span class=hljs-built_in >UInt8</span>, ID_SIZE_BYTES)
+<span class=hljs-number >2</span>-element <span class=hljs-built_in >Vector</span>{<span class=hljs-built_in >UInt8</span>}:
+ <span class=hljs-number >0x7a</span>
+ <span class=hljs-number >0x67</span>
+
+julia&gt; id3 = rand(<span class=hljs-built_in >UInt8</span>, ID_SIZE_BYTES)
+<span class=hljs-number >2</span>-element <span class=hljs-built_in >Vector</span>{<span class=hljs-built_in >UInt8</span>}:
+ <span class=hljs-number >0x9f</span>
+ <span class=hljs-number >0xd2</span>
+
+julia&gt; id4 = rand(<span class=hljs-built_in >UInt8</span>, ID_SIZE_BYTES)
+<span class=hljs-number >2</span>-element <span class=hljs-built_in >Vector</span>{<span class=hljs-built_in >UInt8</span>}:
+ <span class=hljs-number >0xf0</span>
+ <span class=hljs-number >0xab</span>
+
+julia&gt; record = NodeRecord(<span class=hljs-built_in >UInt8</span>(<span class=hljs-number >1</span>), id1, id2, id3, id4)
+NodeRecord{<span class=hljs-built_in >Vector</span>{<span class=hljs-built_in >UInt8</span>}}(<span class=hljs-number >0x01</span>, <span class=hljs-built_in >UInt8</span>[<span class=hljs-number >0x63</span>, <span class=hljs-number >0xad</span>], <span class=hljs-built_in >UInt8</span>[<span class=hljs-number >0x7a</span>, <span class=hljs-number >0x67</span>], <span class=hljs-built_in >UInt8</span>[<span class=hljs-number >0x9f</span>, <span class=hljs-number >0xd2</span>], <span class=hljs-built_in >UInt8</span>[<span class=hljs-number >0xf0</span>, <span class=hljs-number >0xab</span>])
+
+julia&gt; record_bytes = bytes(record)
+<span class=hljs-number >9</span>-element <span class=hljs-built_in >Vector</span>{<span class=hljs-built_in >UInt8</span>}:
+ <span class=hljs-number >0x01</span>
+ <span class=hljs-number >0x63</span>
+ <span class=hljs-number >0xad</span>
+ <span class=hljs-number >0x7a</span>
+ <span class=hljs-number >0x67</span>
+ <span class=hljs-number >0x9f</span>
+ <span class=hljs-number >0xd2</span>
+ <span class=hljs-number >0xf0</span>
+ <span class=hljs-number >0xab</span>
+
+julia&gt; whichpartition(id1)
+<span class=hljs-number >22194</span>
+
+julia&gt; recordstart(id1)
+<span class=hljs-number >0</span>
+
+julia&gt; save(record)
+<span class=hljs-number >9</span>
+
+julia&gt; <span class=hljs-meta >@test</span> node_record(id1) == record_bytes
+Test Passed</code></pre>
+<p>Cool. Nailed it. More to do here, excited to get into some more interesting relationship/property stuff&#33;</p>
+<p>– Cameron</p>
+
+    
+
+<div class=page-foot >
+    mindco © 
+   thanks to <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and <a href="https://julialang.org">Julia</a>.
+<br/>
+</div>
+</div>
+
+
+    
+    
+        <script src="/libs/highlight/highlight.min.js"></script>
+<script>hljs.highlightAll();hljs.configure({tabReplace: '    '});</script>

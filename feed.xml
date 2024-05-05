@@ -23,6 +23,254 @@
 
 <item>
   <title>
+    <![CDATA[  devlog 2024-05-04  ]]>
+  </title>
+  <link> https://blog.comind.me/devlogs/2024-05-04/index.html </link>
+  <guid> https://blog.comind.me/devlogs/2024-05-04/index.html </guid>
+  <description>
+    <![CDATA[  bits, bytes, etc.  ]]>
+  </description>  
+  
+  <content:encoded>
+    <![CDATA[  <h1 id="devlog_2024-05-04_bit-representations_for_graph_vertices">devlog 2024-05-04, bit-representations for graph vertices</h1>
+<p>Lots of fun stuff today&#33; It was rainy for a lot of the morning after my regatta, so I managed to cozy up and do some programming without getting too much sunshine-FOMO.</p>
+<p>In the evening I did actual comind work, and the first part of the day was mostly fucking around with bit-representations for graph databases. I&#39;ll do the comind stuff first and then a brief recap of the graph database work.</p>
+<h2 id="comind_work">comind work</h2>
+<p>I&#39;m adding an endpoint to the server called <code>examine</code>. When you <code>examine</code> a thought, it is a way focusing your attention on a particular piece of content to uncover more information about it.Examinations are essentially detail views of thoughts. </p>
+<p>There&#39;s a few ways I&#39;m imagining this working. Examinations should show you</p>
+<ol>
+<li><p>Directly linked thoughts, i.e. parents, children, replies, etc.</p>
+</li>
+<li><p>A brief description of the surrouding context, i.e. &quot;your friends saw this and have been discussing why you would say something so stupid, in a loving way&quot;. </p>
+</li>
+<li><p>Suggested thoughts that are not linked but seem to be related.</p>
+</li>
+</ol>
+<p>I have &#40;1&#41; done, &#40;3&#41; is easy enough but not done, and &#40;2&#41; is where I spent most of the evening.</p>
+<p>It turns out that contextualizing a &quot;web&quot; of thoughts for language models is not super easy, at least not from a prompt engineering side. I&#39;ve settled for beginning to specify a text format for describing general context and relationships between thoughts.</p>
+<p>When you <code>examine</code> a thought, I go and pull the &quot;neighborhood&quot; of thoughts surrouding your primary thought within some nmber of hops. For example, if I pulled in all thoughts within two hops of <code>A</code> and was looking at a link chain <code>A -&gt; B -&gt; C -&gt; D</code>, I would pull in <code>A</code>, <code>B</code>, and <code>C</code>. </p>
+<p>Then, I need to dump the content of each of those thoughts into a query to provide to the language model. The way this is starting to form is to provide the language model a new comind-specific markup language that feels very 1970.</p>
+<p>Thoughts are wrapped in <em>blocks</em> that include some variables describing interrelationships and annotating specific content.</p>
+<p>Here is the block for the <strong>primary thought</strong>. When you <code>examine</code> a thought, you are making that thought &quot;primary&quot;.</p>
+<p>Here&#39;s something I might write, and how it is rendered in the context prompt:</p>
+<pre><code class="language-julia">&lt;BEGIN PRIMARY THOUGHT BY&#61;cameron&gt;
+here&#39;s some notes i wrote about language models
+&lt;END PRIMARY THOUGHT&gt;</code></pre>
+<p>Within the same prompt, you can optionally include <em>context</em> thoughts that the language model is instructed to review only if relevant to the primary thought. If the thought is in the neighborhood, a <code>HOPS&#61;&#91;number&#93;</code> field is included to suggest to the model that it is more likely to be relevant.</p>
+<pre><code class="language-julia">&lt;BEGIN THOUGHT HOPS&#61;1 BY&#61;cameron&gt;
+language models tend to hallucinate, so it&#39;s important to provide context that is relevant to the primary thought.
+&lt;END THOUGHT&gt;</code></pre>
+<p>Your context window would basically be as full as possible of related thoughts, and then I leave it up to the model to determine what is most relevant for the answer. To determine what I actually want from the model, I found it to help by adding a <code>REQUEST</code> block:</p>
+<pre><code class="language-julia">&lt;BEGIN REQUEST&gt;
+can you please tell me what i know about language models?
+&lt;END REQUEST&gt;</code></pre>
+<p>This whole thing is vaguely hacky, but ideally I could specify a fairly robust markup language for describing context and relationships between thoughts, and then fine-tune models to understand the syntax. More on it later.</p>
+<p>Anyway, the endpoint is kinda done but I broke the fuck out of the embedding system so all of comind is broken&#33; Living the dream.</p>
+<h2 id="graph_database_work">graph database work</h2>
+<p>I also fucked around with graph databases. Today&#39;s thing was to see how binary representations of entities, relationships, and properties work.</p>
+<p>To rephrase – how the fuck do you actually store a node on disk in an efficient way? Neo4j stores nodes as fixed-length 15 byte chunks:</p>
+<ul>
+<li><p>The first byte checks whether the record is in use or can be re-used. Apparently this is called a &quot;tombstone&quot;, thanks to my brother Q for the tip.</p>
+</li>
+<li><p>The next four bytes contain the ID of the first relationship connected to the node.</p>
+</li>
+<li><p>The following four contain the ID of the first property connected to the node.</p>
+</li>
+<li><p>Five store labels references &#40;i.e. Person, or Car&#41;, but they can be inlined apparently if there&#39;s a small number.</p>
+</li>
+<li><p>Final byte reserved for some future use.</p>
+</li>
+</ul>
+<p>I wanted to play around with this, so I wrote some code. My graph specification only has nodes for now, but I&#39;ve made a few alternative choices:</p>
+<ol>
+<li><p>A tombstone byte.</p>
+</li>
+<li><p>An N-byte ID for the node.</p>
+</li>
+<li><p>An N-byte ID for the relationship splay tree. </p>
+</li>
+<li><p>An N-byte ID for the property splay tree.</p>
+</li>
+<li><p>An N-byte ID for the location of the node&#39;s embedding vector, or a pointer to the splay tree if different embedding models are used.</p>
+</li>
+</ol>
+<p>IDs 3-5 are &quot;pointers&quot; in that they refer to positions in storage files containing another fixed-length record. More on the splay trees later, haven&#39;t figured them out yet.</p>
+<p>N here is probably 128, which is big, but I&#39;m still trying to figure out how you support ordered records that are compact and easy to handle in a distributed format. I settled on ULIDs, which are 128-bit and hardened to prevent collisions across distributed systems. </p>
+<p>Here&#39;s how you specify the format of the storage system.</p>
+<ul>
+<li><p><code>ID_TYPE</code> is the type of the ID – how many bytes it takes to represent the ID. Here it&#39;s a 2-byte ID.</p>
+</li>
+<li><p><code>ID_SIZE_BYTES</code> is the number of bytes in the ID.</p>
+</li>
+<li><p><code>NODE_RECORD_SIZE</code> is the number of bytes in the node record – four IDs and a tombstone byte.</p>
+</li>
+<li><p><code>BLOCK_SIZE</code> is the number of records per partition file. A partition file is just a file on disk with the format <code>node.&#91;partition&#93;.dat</code>.</p>
+</li>
+</ul>
+<pre><code class="language-julia">const ID_TYPE &#61; UInt16
+const ID_SIZE_BYTES &#61; sizeof&#40;ID_TYPE&#41;
+const NODE_RECORD_SIZE &#61; 1 &#43; ID_SIZE_BYTES * 4
+const BLOCK_SIZE &#61; 2 # Records per partition file</code></pre>
+<p>In a simpler version of this, say where we only have 1-bit IDs and a block size of 2, then the binary representation of each partition file looks like</p>
+<pre><code class="language-julia">10000 # First record, tombstone is set
+00000 # Second record, tombstone is not set</code></pre>
+<p>and so on.</p>
+<p>Anyway. Now we need to do some byte representation stuff. Most of the shit on your machine is bytes and thus so is the code, and working with raw bits and casting up to <code>UInt128</code> or whatever all the time sucks. So I made <code>ByteArray</code>, which just wraps around a <code>Vector&#123;UInt8&#125;</code> and lets you treat it like a standard array but supports offset indexing.</p>
+<pre><code class="language-julia">struct ByteArray
+    bits::Vector&#123;UInt8&#125;
+end# Standard interface implementations
+Base.length&#40;b::ByteArray&#41; &#61; length&#40;b.bits&#41; * 8
+Base.firstindex&#40;b::ByteArray&#41; &#61; 1
+Base.lastindex&#40;b::ByteArray&#41; &#61; length&#40;b.bits&#41; * 8
+Base.getindex&#40;b::ByteArray, i::Int&#41; &#61; b.bits&#91;8i-1:8i&#93;
+Base.setindex&#40;b::ByteArray, v::Vector&#123;UInt8&#125;, i::Int&#41; &#61; b.bits&#91;8i-1:8i&#93; &#61; v</code></pre>
+<p>We now need to be able to convert an array of bytes to whatever the root ID type is, and vice versa. For example,  if I have a <code>UInt16</code> ID type, then I need to be able to convert to <code>UInt8</code> values into a <code>UInt16</code> ID.</p>
+<pre><code class="language-julia">id2bytes&#40;x&#41; &#61; reinterpret&#40;UInt8, &#91;x&#93;&#41;
+bytes2id&#40;x&#41; &#61; reinterpret&#40;ID_TYPE, x&#41; |&gt; only # TODO not clear on why this returns a single vector</code></pre>
+<p>The <code>ByteVector</code> representation of an ID is just a vector of bytes, like so:</p>
+<pre><code class="language-julia">2-element Vector&#123;UInt8&#125;:
+ 0x41
+ 0x3b</code></pre>
+<p>but converts to the <code>UInt16</code> ID type when you use <code>bytes2id</code>:</p>
+<pre><code class="language-julia">0x3b41</code></pre>
+<p>Let&#39;s bundle these up into a node record, which stores all the different IDs it tracks, as well as some constructors.</p>
+<pre><code class="language-julia">struct NodeRecord&#123;BV&#125;
+    tombstone::UInt8
+    id::BV
+    relationships::BV
+    properties::BV
+    vector::BV
+endfunction NodeRecord&#40;tombstone::Bool, id, relationships, properties, vector&#41;
+    NodeRecord&#40;tombstone, id2bytes&#40;id&#41;, id2bytes&#40;relationships&#41;, id2bytes&#40;properties&#41;, id2bytes&#40;vector&#41;&#41;
+endfunction NodeRecord&#40;bytes::Vector&#123;UInt8&#125;&#41;
+    tombstone &#61; bytes&#91;1&#93;
+    id &#61; bytes&#91;2&#93;
+    relationships &#61; bytes&#91;3&#93;
+    properties &#61; bytes&#91;4&#93;
+    vector &#61; bytes&#91;5&#93;
+    NodeRecord&#40;tombstone, id, relationships, properties, vector&#41;
+end</code></pre>
+<p>We know which partition file the record belongs to by it&#39;s ID. Only <code>BLOCK_SIZE</code> records are stored in a partition file, and the IDs of the records in the file are sequential. If we have IDs 1,2,3, and 4 and a block size of 2, then 1 and 2 would be in partition 1, 3 and 4 would be in partition 2. </p>
+<p><code>whichpartition</code> is a function that takes an ID and returns the partition file it belongs to.</p>
+<pre><code class="language-julia">&quot;&quot;&quot;
+    whichpartition&#40;id&#41;Determine which partition file a given ID belongs to. Partitions are of size BLOCK_SIZE nodes.
+An ID of 1 through BLOCK_SIZE belongs to partition 1, BLOCK_SIZE&#43;1 through 2*BLOCK_SIZE belongs to partition 2, etc.
+&quot;&quot;&quot;
+function whichpartition&#40;byteid&#41;
+    return div&#40;bytes2id&#40;byteid&#41; - 1, BLOCK_SIZE&#41; &#43; 1
+end# Also get the name of the file we&#39;ll write/read to.
+datafile&#40;n::NodeRecord&#41; &#61; &quot;node.&#36;&#40;whichpartition&#40;n.id&#41;&#41;.dat&quot;</code></pre>
+<p>We also know that, within a binary file, we can skip ahead to where the record is if we know its ID. <code>recordstart</code> is a function that takes an ID and returns the start of the record <em>within</em> a partition file. In the above example, if I have a record with ID 3, then the record starts at the 6th byte of the file if records are five-bytes long. The whole file is 12 bytes.</p>
+<pre><code class="language-julia">&quot;&quot;&quot;
+    recordstart&#40;id&#41;Determine the start of a record within a partition file. Records are of size NODE_RECORD_SIZE,
+so a record starts at a multiple of NODE_RECORD_SIZE. 
+&quot;&quot;&quot;
+function recordstart&#40;byteid&#41;
+    return mod&#40;bytes2id&#40;byteid&#41; - 1, BLOCK_SIZE&#41; * NODE_RECORD_SIZE
+end</code></pre>
+<p>Next we want to convert a <code>NodeRecord</code> to a byte array so we can write it to disk.</p>
+<pre><code class="language-julia">&quot;&quot;&quot;
+    bytes&#40;id&#41;Node storage contains a leading byte indicating whether the node is active.
+It is followed by the 128-bit node ID.
+Then are 128-bit IDs for each of the relationship, properties, and vector files.&#96;bytes&#96; converts a &#96;NodeRecord&#96; to a byte array.
+&quot;&quot;&quot;
+function bytes&#40;n::NodeRecord&#41;
+    return vcat&#40;
+        UInt8&#40;n.tombstone&#41;,
+        n.id,
+        n.relationships,
+        n.properties,
+        n.vector
+    &#41;
+end</code></pre>
+<p>This gets used here, where we write a <code>NodeRecord</code> to the partition file it belongs to:</p>
+<pre><code class="language-julia">function save&#40;n::NodeRecord&#41;
+    # Get the partition file
+    partition &#61; whichpartition&#40;n.id&#41;
+    filename &#61; datafile&#40;n&#41;    # If the partition file does not exist, create it. Fill the whole BLOCK_SIZE
+    # with zeros to make the file size a multiple of BLOCK_SIZE.
+    if &#33;isfile&#40;filename&#41;
+        open&#40;filename, &quot;w&quot;&#41; do f
+            write&#40;f, zeros&#40;UInt8, NODE_RECORD_SIZE * BLOCK_SIZE&#41;&#41;
+        end
+    else
+        # Check that the partition file is of the correct size
+        if filesize&#40;filename&#41; &#33;&#61; NODE_RECORD_SIZE * BLOCK_SIZE
+            @error &quot;Partition file is not the correct size&quot; filename filesize&#40;filename&#41; NODE_RECORD_SIZE * BLOCK_SIZE
+        end
+    end    # Write the record
+    open&#40;filename, append&#61;true&#41; do f
+        seek&#40;f, recordstart&#40;n.id&#41;&#41;
+        write&#40;f, bytes&#40;n&#41;&#41;
+    end
+end</code></pre>
+<p>To unpack this briefly:</p>
+<ol>
+<li><p>Get the partition file to write to.</p>
+</li>
+<li><p>If the partition file does not exist, create it. Fill the whole <code>BLOCK_SIZE</code> with zeros to make the file size a multiple of <code>BLOCK_SIZE</code>.</p>
+</li>
+<li><p>Write the record to the partition file at its location &#40;we go to the record start spot using <code>seek</code>&#41;.</p>
+</li>
+</ol>
+<p>Then, lastly, we can load the record back using</p>
+<pre><code class="language-julia">&quot;&quot;&quot;
+    node_record&#40;id&#41;Load a &#96;NodeRecord&#96; from the file system.
+&quot;&quot;&quot;
+function node_record&#40;id&#41;
+    partition &#61; whichpartition&#40;id&#41;
+    filename &#61; &quot;node.&#36;partition.dat&quot;
+    open&#40;filename, &quot;r&quot;&#41; do f
+        seek&#40;f, recordstart&#40;id&#41;&#41;
+        read&#40;f, NODE_RECORD_SIZE&#41;
+    end
+end</code></pre>
+<p>Voila&#33;</p>
+<p>Now, the following works:</p>
+<pre><code class="language-julia">julia&gt; id1 &#61; rand&#40;UInt8, ID_SIZE_BYTES&#41;
+2-element Vector&#123;UInt8&#125;:
+ 0x63
+ 0xadjulia&gt; id2 &#61; rand&#40;UInt8, ID_SIZE_BYTES&#41;
+2-element Vector&#123;UInt8&#125;:
+ 0x7a
+ 0x67julia&gt; id3 &#61; rand&#40;UInt8, ID_SIZE_BYTES&#41;
+2-element Vector&#123;UInt8&#125;:
+ 0x9f
+ 0xd2julia&gt; id4 &#61; rand&#40;UInt8, ID_SIZE_BYTES&#41;
+2-element Vector&#123;UInt8&#125;:
+ 0xf0
+ 0xabjulia&gt; record &#61; NodeRecord&#40;UInt8&#40;1&#41;, id1, id2, id3, id4&#41;
+NodeRecord&#123;Vector&#123;UInt8&#125;&#125;&#40;0x01, UInt8&#91;0x63, 0xad&#93;, UInt8&#91;0x7a, 0x67&#93;, UInt8&#91;0x9f, 0xd2&#93;, UInt8&#91;0xf0, 0xab&#93;&#41;julia&gt; record_bytes &#61; bytes&#40;record&#41;
+9-element Vector&#123;UInt8&#125;:
+ 0x01
+ 0x63
+ 0xad
+ 0x7a
+ 0x67
+ 0x9f
+ 0xd2
+ 0xf0
+ 0xabjulia&gt; whichpartition&#40;id1&#41;
+22194julia&gt; recordstart&#40;id1&#41;
+0julia&gt; save&#40;record&#41;
+9julia&gt; @test node_record&#40;id1&#41; &#61;&#61; record_bytes
+Test Passed</code></pre>
+<p>Cool. Nailed it. More to do here, excited to get into some more interesting relationship/property stuff&#33;</p>
+<p>– Cameron</p>
+ ]]>
+  </content:encoded>
+    
+  <pubDate>Sat, 04 May 2024 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>mindco</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
     <![CDATA[  devlog 2024-05-03  ]]>
   </title>
   <link> https://blog.comind.me/devlogs/2024-05-03/index.html </link>
