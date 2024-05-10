@@ -42,11 +42,8 @@
 </li>
 <li><p>Suggestions may be related content, something novel from a language model, another meld, etc.</p>
 </li>
-<li><p>There&#39;s an issue with how I&#39;ve been doing them. I&#39;ve been sending all thoughts in a bucket &#40;A, B, C&#41; and then just getting</p>
+<li><p>There&#39;s an issue with how I&#39;ve been doing them. I&#39;ve been sending all thoughts in a bucket &#40;A, B, C&#41; and then just getting a bulk suggestion for all the items, rather than produce a set of suggestions for <em>each</em> thought.</p>
 </li>
-</ul>
-<p>a bulk suggestion for all the items, rather than produce a set of suggestions for <em>each</em> thought.</p>
-<ul>
 <li><p>So, started laying the ground work on the client side to handle this. Thoughts now have &quot;space&quot; underneath them for suggestions, and the core code to handle that for different melds is now also working.</p>
 </li>
 <li><p>Here&#39;s a rough sketch of what this vaguely looks like:</p>
