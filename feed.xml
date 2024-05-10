@@ -23,6 +23,75 @@
 
 <item>
   <title>
+    <![CDATA[  devlog 2024-05-09  ]]>
+  </title>
+  <link> https://blog.comind.me/devlogs/2024-05-09/index.html </link>
+  <guid> https://blog.comind.me/devlogs/2024-05-09/index.html </guid>
+  <description>
+    <![CDATA[  communal thinking tools  ]]>
+  </description>  
+  
+  <content:encoded>
+    <![CDATA[  <h1 id="devlog_2024-05-09_communal_thinking_tools">devlog 2024-05-09, communal thinking tools</h1>
+<ul>
+<li><p>Wrote a big-ass <a href="https://twitter.com/cameron_pfiffer/status/1788791693619425715">X thread</a>. I copied the tweets below.</p>
+</li>
+<li><p>Started permitting suggestions being attributed to specific thoughts in a meld. </p>
+</li>
+<li><p>A <em>suggestion</em> is a set of related thoughts that you may choose to introduce into your meld. </p>
+</li>
+<li><p>Suggestions may be related content, something novel from a language model, another meld, etc.</p>
+</li>
+<li><p>There&#39;s an issue with how I&#39;ve been doing them. I&#39;ve been sending all thoughts in a bucket &#40;A, B, C&#41; and then just getting</p>
+</li>
+</ul>
+<p>a bulk suggestion for all the items, rather than produce a set of suggestions for <em>each</em> thought.</p>
+<ul>
+<li><p>So, started laying the ground work on the client side to handle this. Thoughts now have &quot;space&quot; underneath them for suggestions, and the core code to handle that for different melds is now also working.</p>
+</li>
+<li><p>Here&#39;s a rough sketch of what this vaguely looks like:</p>
+</li>
+</ul>
+<pre><code class="language-julia">╭────────────────────────────────╮
+│  A thought                     │
+╰────────────────────────────────╯      - A suggestions -╭────────────────────────────────╮
+│  B thought                     │
+╰────────────────────────────────╯      - B suggestions -</code></pre>
+<p>I&#39;m tired as fuck. Sprinted up the steep part of Telegraph Hill today with my backpack and also I guess I don&#39;t sleep anymore.</p>
+<p>– Cameron</p>
+<h2 id="the_x_thread">the x thread</h2>
+<p><a href="https://twitter.com/cameron_pfiffer/status/1788791693619425715">&#40;source&#41;</a></p>
+<p>People will use this stuff for day-to-day things. Shopping lists. Booking flights. Messaging.</p>
+<p>And also for big things. Research too – you could just write a paper into your communal thought pool. Elicit is starting this path already. Very cool product. From elicit.com There&#39;s two outcomes here and it really depends on how things evolve.</p>
+<ol>
+<li><p>There will be a monopoly. A single platform that handles everyone&#39;s thoughts and resembles google.</p>
+</li>
+<li><p>Fierce, specialized competition not unlike the web of the 90s and early 00s.</p>
+</li>
+</ol>
+<p>Comind is targeting the consumer social angle – how do you do the social and learning part?</p>
+<p>Subconcious is tackling the &quot;how&quot; part – how do you actually make a massive-scale, open P2P comms layer?</p>
+<p>Elicit is tackling the deep, focused research part. It&#39;ll be weird seeing these evolve, because people are going to use them. </p>
+<p>Communal thinking tools are useful and interesting, and it&#39;ll get rid of a lot of shit we don&#39;t need &#40;emails/slack/a million texting apps&#41;. I&#39;m not really an e/acc person, I&#39;m not really an AI doomer. I&#39;m sort of both – I think there&#39;s an amazing future for AI stuff in our world, but also great risk, and I think it&#39;s wise to be careful. That said, general artificial intelligence is probably right around the corner.  It is weird to say that, but it&#39;s true – and I&#39;m not the only person working on this stuff. I think it has legs. Who else is doing it? Subsconcious is the big one someone pointed out to me. @co<em>mind</em>co  has kind of a &#40;very cool&#41; competitor in the distributed protocol for thought called Subsconcious. It&#39;s been stressing me out and I&#39;m struggling with motivation due to it.</p>
+<p>https://subconscious.network</p>
+<p>On blue place, Paul &#40;atproto dev at bsky&#41; has this helpful comment: The nice thing here is that I am product-focused. I want people to have a simple, clean app that can be nimble because it is not a protocol. I can just change things as needed. So, thanks Paul.</p>
+<p>&#40;h/t  @ThatAkhilRao &#41; Seeing others think about this stuff is good because I know that something like comind will have legs. </p>
+<p>However, it is also bad, because that thing may not be comind. It is difficult to have a direct competitor, especially because I can look over at their &#40;moderately large&#41; Discord and see what&#39;s going on. The engineers are really seasoned engineers with a lot of technical chops. They have thought really deeply and clearly about how to do P2P correctly, which is sort of a long-term goal of comind&#39;s. From github.com They also have a cool little app demo in the discord &#40;really loved it&#41; that is upsettingly familiar to my general design. It kind of shook me a little because they have a person who is actually a front-end engineer, while I am an overextended hack. Kind of weird to be back in imposter-syndrome land. </p>
+<p>But&#33; I should probably try to keep in mind that I only work on comind because I absolutely fucking love it. If it flops, if I get beat out, whatever, got to fuck around in this tiny nascent space that I suspect will be large.</p>
+ ]]>
+  </content:encoded>
+    
+  <pubDate>Thu, 09 May 2024 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>mindco</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
     <![CDATA[  devlog 2024-05-04  ]]>
   </title>
   <link> https://blog.comind.me/devlogs/2024-05-04/index.html </link>
