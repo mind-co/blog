@@ -58,8 +58,27 @@
 <p>– Cameron</p>
 <h2 id="the_x_thread">the x thread</h2>
 <p><a href="https://twitter.com/cameron_pfiffer/status/1788791693619425715">&#40;source&#41;</a></p>
+<p>I wanted to talk about comind, and what I think the future of social platforms, AI, and knowledge management.</p>
+<p>Let communal thinking tools 🧵</p>
+<p>I spend a lot of time thinking about this. Walking. Running. Going to bed. Waking up. Showering. Eating. Sitting on the train. Talking. Basically all the time.</p>
+<p>I might be pretty close to an expert in the space for that reason, especially because it is very small right now.</p>
+<p>Comind and another, Subsconcious &#40;noosphere&#41;, are part of this emerging system of organizing, sharing, permissioning, and exposing simple text for the explicit purpose of using AI to communicate, learn, and organize information.</p>
+<p>The idea behind these tools seems to be making personal knowledge sharable in a collaborative setting. </p>
+<p>Like the World Wide Web, but more restrictive – no HTML or ugly token-heavy content. </p>
+<p>Just text. Why?</p>
+<p>Because language is how we communicate extraordinarily complicated ideas. You and I can talk right now on a computer that humans built because they were able to talk, to build on millennia of learning.</p>
+<p>Language is valuable. It is how we store the entirety of the real-world&#39;s information, it is how we transmit useful information, learn, evolve, discover, etc.</p>
+<p>Communal thinking tools should index that knowledge in a simple, human &#43; machine-readable structure. Papers, tweets, SMS, your emails, web pages, etc. </p>
+<p>All of this stuff is clunky and spread all over the place. Thinking tools put this in a box that a robot helps you understand.</p>
+<p>Something I am now learning is that lots of people are starting to think about the exact same things as I have been thinking about for nearly a year now. I&#39;ve heard this from people on multiple projects, and people I have just randomly met.</p>
+<p>And what that thing is a new way for humans and generative models to interact. Something like a public square where we all communicate and learn with one another, and where machines can do the same.</p>
+<p>Basically, a big shared brain.</p>
+<p>I can see a version of the future where we have many, many tiny agents, all of whom are going to need to access some kind of information to do their jobs. </p>
+<p>They need an API for this, or something very cheap to use. Something clean and simple. At the same time, this platform is not going to be useful if it doesn&#39;t have people on it. </p>
+<p>So, the obvious fix here is just to put everything in one bucket, make sure information goes where people want it to go, handle privacy, etc. in a clean way.</p>
 <p>People will use this stuff for day-to-day things. Shopping lists. Booking flights. Messaging.</p>
-<p>And also for big things. Research too – you could just write a paper into your communal thought pool. Elicit is starting this path already. Very cool product. From elicit.com There&#39;s two outcomes here and it really depends on how things evolve.</p>
+<p>And also for big things. Research too – you could just write a paper into your communal thought pool. Elicit is starting this path already. Very cool product.</p>
+<p>There&#39;s two outcomes here and it really depends on how things evolve.</p>
 <ol>
 <li><p>There will be a monopoly. A single platform that handles everyone&#39;s thoughts and resembles google.</p>
 </li>
@@ -69,11 +88,20 @@
 <p>Comind is targeting the consumer social angle – how do you do the social and learning part?</p>
 <p>Subconcious is tackling the &quot;how&quot; part – how do you actually make a massive-scale, open P2P comms layer?</p>
 <p>Elicit is tackling the deep, focused research part. It&#39;ll be weird seeing these evolve, because people are going to use them. </p>
-<p>Communal thinking tools are useful and interesting, and it&#39;ll get rid of a lot of shit we don&#39;t need &#40;emails/slack/a million texting apps&#41;. I&#39;m not really an e/acc person, I&#39;m not really an AI doomer. I&#39;m sort of both – I think there&#39;s an amazing future for AI stuff in our world, but also great risk, and I think it&#39;s wise to be careful. That said, general artificial intelligence is probably right around the corner.  It is weird to say that, but it&#39;s true – and I&#39;m not the only person working on this stuff. I think it has legs. Who else is doing it? Subsconcious is the big one someone pointed out to me. @co<em>mind</em>co  has kind of a &#40;very cool&#41; competitor in the distributed protocol for thought called Subsconcious. It&#39;s been stressing me out and I&#39;m struggling with motivation due to it.</p>
+<p>Communal thinking tools are useful and interesting, and it&#39;ll get rid of a lot of shit we don&#39;t need &#40;emails/slack/a million texting apps&#41;.</p>
+<p>I&#39;m not really an e/acc person, I&#39;m not really an AI doomer. I&#39;m sort of both – I think there&#39;s an amazing future for AI stuff in our world, but also great risk, and I think it&#39;s wise to be careful.</p>
+<p>That said, general artificial intelligence is probably right around the corner.  It is weird to say that, but it&#39;s true – and I&#39;m not the only person working on this stuff. I think it has legs.</p>
+<p>Who else is doing it? Subsconcious is the big one someone pointed out to me.</p>
+<p>@co<em>mind</em>co has kind of a &#40;very cool&#41; competitor in the distributed protocol for thought called Subsconcious. It&#39;s been stressing me out and I&#39;m struggling with motivation due to it.</p>
 <p>https://subconscious.network</p>
 <p>On blue place, Paul &#40;atproto dev at bsky&#41; has this helpful comment: The nice thing here is that I am product-focused. I want people to have a simple, clean app that can be nimble because it is not a protocol. I can just change things as needed. So, thanks Paul.</p>
-<p>&#40;h/t  @ThatAkhilRao &#41; Seeing others think about this stuff is good because I know that something like comind will have legs. </p>
-<p>However, it is also bad, because that thing may not be comind. It is difficult to have a direct competitor, especially because I can look over at their &#40;moderately large&#41; Discord and see what&#39;s going on. The engineers are really seasoned engineers with a lot of technical chops. They have thought really deeply and clearly about how to do P2P correctly, which is sort of a long-term goal of comind&#39;s. From github.com They also have a cool little app demo in the discord &#40;really loved it&#41; that is upsettingly familiar to my general design. It kind of shook me a little because they have a person who is actually a front-end engineer, while I am an overextended hack. Kind of weird to be back in imposter-syndrome land. </p>
+<p>&#91;&#91;image omitted&#93;&#93;</p>
+<p>Seeing others think about this stuff is good because I know that something like comind will have legs. </p>
+<p>However, it is also bad, because that thing may not be comind.</p>
+<p>It is difficult to have a direct competitor, especially because I can look over at their &#40;moderately large&#41; Discord and see what&#39;s going on. The engineers are really seasoned engineers with a lot of technical chops.</p>
+<p>They have thought really deeply and clearly about how to do P2P correctly, which is sort of a long-term goal of comind&#39;s.</p>
+<p>They also have a cool little app demo in the discord &#40;really loved it&#41; that is upsettingly familiar to my general design. It kind of shook me a little because they have a person who is actually a front-end engineer, while I am an overextended hack.</p>
+<p>Kind of weird to be back in imposter-syndrome land. </p>
 <p>But&#33; I should probably try to keep in mind that I only work on comind because I absolutely fucking love it. If it flops, if I get beat out, whatever, got to fuck around in this tiny nascent space that I suspect will be large.</p>
  ]]>
   </content:encoded>
