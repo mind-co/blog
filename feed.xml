@@ -23,6 +23,120 @@
 
 <item>
   <title>
+    <![CDATA[  devlog 2024-05-24  ]]>
+  </title>
+  <link> https://blog.comind.me/devlogs/2024-05-24/index.html </link>
+  <guid> https://blog.comind.me/devlogs/2024-05-24/index.html </guid>
+  <description>
+    <![CDATA[  been a hot minute  ]]>
+  </description>  
+  
+  <content:encoded>
+    <![CDATA[  <h1 id="devlog_2024-05-24">devlog 2024-05-24</h1>
+<p>Wow, been a long time since my last devlog. It&#39;s been a weird few weeks, with some misc poor moods, lots of evening/weekend events. My actual job at Stanford has also been a lot recently.</p>
+<p>Anyway – I thought I&#39;d do a whole-ass overview of what&#39;s been going on and what&#39;s changed.</p>
+<h2 id="product">Product</h2>
+<ul>
+<li><p>I sat down and figured out the entire API the server needs to provide, what tools the front-end needs to be able to handle, and basically how all of comind is supposed to work as a product. I&#39;ll be writing this up over the next few days thought it will sadly be internal for the moment.</p>
+</li>
+<li><p>It&#39;ll be nice to sit down and work through each of the API points. There are a handful of people in a Telegram channel with me who are vaguely interested in the project – some of them have offered to help, but I have been extraordinarily bad at project management and making Comind a hospitable environment for new contributors. </p>
+</li>
+<li><p>Hopefully, building a clear, concise design document for the backend will help me get other folks involved to the extent that they are interested.</p>
+</li>
+<li><p>The product for comind is a server and an API, and the company will provide an open-source front-end for public use and development. Later on, we&#39;ll provide a paid-for commercial front-end that&#39;s not dissimilar from Slack on growth hormones.</p>
+</li>
+<li><p>I am occasionally annoyed at how long it has taken me to appreciate the benefit of completing a <strong>complete plan</strong> for a product. I don&#39;t think I could have done anything different, since all my fucking around thusfar has been extremely helpful for me understanding exactly what I want comind to be.</p>
+</li>
+<li><p>Time to get serious and get shit out the door. This is a good product.</p>
+</li>
+</ul>
+<h2 id="backend">Backend</h2>
+<ul>
+<li><p>Lots of tinkering with graph database stuff and kind of just hating all the tools that exist. It will surprise nobody that the API support in Julia for various graph databases like Neo4j, TigerGraph, TerminusDB, etc. are either broken to shit or completely non-existent.</p>
+</li>
+<li><p>I ended up writing an entire Julia package for property graphs &#40;PropertyGraphs.jl&#41; that supports pattern matching queries, with the eventual goal of producing an industrial-grade graph system for Comind&#39;s internal usage. The work was heavily inspired by <a href="https://github.com/JuliaComputing/SQLiteGraph.jl">SQLiteGraph.jl</a>, an incredibly simple package.</p>
+</li>
+</ul>
+<pre><code class="language-julia">using PropertyGraphs# Set up some nodes
+john &#61; Node&#40;1, &quot;person&quot;, &quot;human&quot;; name&#61;&quot;John Doe&quot;, age&#61;25&#41;
+jane &#61; Node&#40;2, &quot;person&quot;, &quot;human&quot;; name&#61;&quot;Jane Doe&quot;, age&#61;26&#41;# Set up some edges
+john_jane &#61; Edge&#40;1, 2, &quot;friend of&quot;; since&#61;2010&#41;
+jane_john &#61; Edge&#40;2, 1, &quot;friend of&quot;; since&#61;2011&#41;
+husband &#61; Edge&#40;1, 2, &quot;husband of&quot;; since&#61;1992&#41;
+wife &#61; Edge&#40;2, 1, &quot;wife of&quot;; since&#61;1992&#41;# Make the graph
+graph &#61; PropertyGraph&#40;
+      Node&#91;john, jane&#93;, 
+      Edge&#91;john_jane, jane_john, husband, wife&#93;
+&#41;# Perform a match query to get all &quot;human&quot; nodes,
+# returns a new graph with john and jane.
+match&#40;graph, NodePattern&#40;&quot;person&quot;, &quot;human&quot;&#41;&#41;# returns just john
+match&#40;graph, NodePattern&#40;name&#61;&quot;John Doe&quot;&#41;&#41;# Matching edges is similar, this returns a graph with 
+# just the &quot;friend of&quot; edges
+match&#40;
+      graph, 
+      EdgePattern&#40;&quot;friend of&quot;&#41;
+&#41;# You can also provide an arbitrary number of patterns to 
+# match on. For example, this will return a graph with
+# john and jane, as well as the husband/wife edges
+# between them.
+match&#40;
+      graph,
+      NodePattern&#40;name&#61;&quot;John Doe&quot;&#41;,
+      NodePattern&#40;name&#61;&quot;Jane Doe&quot;&#41;,
+      EdgePattern&#40;&quot;husband of&quot;&#41;,
+      EdgePattern&#40;&quot;wife of&quot;&#41;,
+&#41;</code></pre>
+<ul>
+<li><p>It was fun to write this, and it came together very quickly. It sadly does not implement the Graphs.jl abstract graph interface &#40;yet&#41; as there was some overhead I just wasn&#39;t willing to deal with for a prototype package.</p>
+</li>
+<li><p>Eventually, PropertyGraphs.jl will sit on top of postgres and will be easily loaded/saved to disk, and the comind server will essentially just be running a large, in-memory graph DB. Over time the plan is to add tooling for distributed graph processing.</p>
+</li>
+</ul>
+<h2 id="frontend">Frontend</h2>
+<ul>
+<li><p>The frontend has come a long way. The design is simple and clean, though lacking a lot of features.</p>
+</li>
+</ul>
+<p><img src="https://blog.comind.me/assets/2024-05-24/main-page.png" alt="The main page" /> <img src="https://blog.comind.me/assets/2024-05-24/short-page.png" alt="The main page, narrow" /></p>
+<ul>
+<li><p>You can also talk to people on it in melds. My friend Grace and I had our first conversation on Comind a few days ago – it was broken as hell, you had to refresh the page to see new messages – but it <strong>worked</strong>. Fuckin incredible.</p>
+</li>
+<li><p>There are publicly accessible melds, the first of which is the void cafe:</p>
+</li>
+</ul>
+<p><img src="https://blog.comind.me/assets/2024-05-24/void-cafe.png" alt="The void cafe" /></p>
+<ul>
+<li><p>I did a massive overhaul to how the front-end handles suggestions &#40;thoughts you might want to think about&#41;. Now, there&#39;s a little &quot;think&quot; button in the bottom right that will show you thoughts that are related:</p>
+</li>
+</ul>
+<p><img src="https://blog.comind.me/assets/2024-05-24/thought-bubble.png" alt="A thought bubble" /></p>
+<ul>
+<li><p>Pressing the think button currently does <a href="https://en.wikipedia.org/wiki/Semantic_search">semantic search</a> to show you related thoughts, but we&#39;re working on the recommender system to show you more relevant thoughts that include graph information, popularity, recency, etc.</p>
+</li>
+<li><p>Things I like about the design     - It&#39;s simple and clean     - It has a minimalistic design     - It&#39;s unobtrusive</p>
+</li>
+<li><p>Things I don&#39;t like about the design     - It takes up too much screen real estate     - It&#39;s slow and doesn&#39;t feel &quot;snappy&quot;     - It&#39;s not the most mobile friendly</p>
+</li>
+</ul>
+<h2 id="misc">Misc</h2>
+<p>Life has been very much in the way lately. I&#39;ve been able to do some work on comind here and there but I&#39;ve been quite burned out from work and I often feel like I need a break. The nights and weekends thing I&#39;ve been doing is fun and all, but it has been very difficult to juggle having a job, trying to exercise regularly, and spending time with people I love.</p>
+<p>At the same time, I&#39;m also looking for work as my postdoctoral contract ends relatively soon. Sadly, I do not have the financial resources to take a vacation of any kind, otherwise I would <em>happily</em> take off several months to work on comind. The days when I have a full workday are absolutely <em>insane</em> – I end up accomplishing the same amount of work in a day that I do over an entire week of nights &amp; weekends.</p>
+<p>Anyway. Looking forward to more stuff. I am delighted with the property graph stuff, and I&#39;m happy I was able to sit down and hand-write the entire business down. Feels good to have a plan.</p>
+<p>– Cameron</p>
+ ]]>
+  </content:encoded>
+    
+  <pubDate>Fri, 24 May 2024 00:00:00 +0000</pubDate>  
+  
+  
+  <atom:author>
+    <atom:name>mindco</atom:name>
+  </atom:author>
+        
+</item>
+
+<item>
+  <title>
     <![CDATA[  devlog 2024-05-09  ]]>
   </title>
   <link> https://blog.comind.me/devlogs/2024-05-09/index.html </link>
