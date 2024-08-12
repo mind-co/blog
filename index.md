@@ -102,7 +102,6 @@ contact us at [inquiries@mindco.link](mailto:inquiries@mindco.link) or send good
 - we try to keep [devlogs](/devlogs/)
 - we've got a list of things that comind is intended to address on our [inspirations](/inspirations) page.
 
-
 also some blog posts
 
 {{blogposts}}
