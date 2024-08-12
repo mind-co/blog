@@ -59,9 +59,9 @@ At the same time, all the language model/gen AI stuff in python is 100% the best
 
 As many of you know, I don't really care for Python that much. It's a pain to work in. The amount of time I've spent struggling with virtual environments, installing packages, sifting through versioning and dependency issues, performance, and general anguish is not funny at all.
 
-The core of Python is a rotted husk, and the only reason it survives is because (a) it has an extremely approachable syntax, and (b) the ecosystem is so incredible that everyone has to use it by dint of network effects.
+Python works because (a) it has an extremely approachable syntax, and (b) the ecosystem is so incredible that everyone has to use it by dint of network effects.
 
-That said -- network effects are a real thing. My time is valuable, and ultimately Python has a hilarious amount of aggregate investment in it each year. All I need is an API right now, and that's proven difficult for me.
+Network effects are a real thing. My time is valuable, and ultimately Python has a hilarious amount of aggregate investment in it each year. All I need is an API right now, and that's proven difficult for me.
 
 Anyway, who knows what I'll decide there. Ultimately I just tinker around with stuff. Maybe something will stick.
 
