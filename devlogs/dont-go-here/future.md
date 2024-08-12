@@ -6,7 +6,7 @@ __TLDR__: comind development will be quiet because I have a new job, public-faci
 
 I've been working on comind for about a year now. It has been (and still is) the best project I've ever worked on, and the one that has held my attention for the longest. I also still believe that something like comind is going to exist. I am in love with the project, I'm still addicted to it, and I think about it constantly. I have nearly a hundred thousand lines of Julia, TypeScript, and Dart code.
 
-That said, I am soon going to be a developer relations engineer at [.txt](https://dottxt.co). Developer relations is a public role, and part of doing that job ethically means that I should not market personal projects. It's not in line with my personal values to use my company-sponsored presence to market personal projects. 
+That said, I am soon going to be in a public-facing role, and part of doing that job ethically means that I should not market personal projects. It's not in line with my personal values to use my company-sponsored presence to market personal projects. 
 
 I like my new job a lot and I want to do it well. It's a perfect fit for me, and so I have to kind of pull back a little bit from comind development because it is the correct thing to do.
 
